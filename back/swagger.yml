@@ -1,0 +1,191 @@
+# ====== CABECERA DEL DOCUMENTO OPENAPI ======
+openapi: 3.0.0                   # versión del estándar OpenAPI que usamos
+info:
+  title: Coffee Shop API         # título que se muestra en Swagger UI
+  version: '1.0.0'               # versión de tu API (usar string es buena práctica)
+  description: >                 # descripción visible en la cabecera de Swagger
+    API para la gestión del café. Incluye endpoints de ejemplo y el CRUD de productos.
+
+# lista de servidores contra los que Swagger va a emitir requests
+servers:
+  - url: http://localhost:3001   # nuestro backend local (Express)
+
+# ====== RUTAS / ENDPOINTS ======
+paths:
+
+  # -------- Hello de prueba --------
+  /api/hello:
+    get:                         # método HTTP GET
+      summary: Endpoint de prueba
+      responses:
+        '200':                   # código de estado esperado
+          description: Respuesta exitosa
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:       # el JSON devuelve { message: "..." }
+                    type: string
+                    example: Hola Manu, tu servidor funciona!
+
+  # -------- Echo para ver headers/origen --------
+  /api/echo:
+    get:
+      summary: Devuelve los headers y origen de la petición
+      responses:
+        '200':
+          description: Respuesta con headers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:   { type: string, example: Echo }
+                  origin:    { type: string, nullable: true, example: http://localhost:5173 }
+                  headers:   { type: object }
+
+  # -------- Protected con AUTH Bearer (usará el botón Authorize) --------
+  /api/protected:
+    get:
+      summary: Endpoint protegido de ejemplo
+      description: Requiere un token Bearer en el header Authorization.
+      security:
+        - bearerAuth: []         # le dice a Swagger que este endpoint necesita auth "bearerAuth"
+      responses:
+        '200':
+          description: Acceso autorizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:            { type: boolean, example: true }
+                  authRecibido:  { type: string,  example: Bearer prueba123 }
+        '401':
+          description: No autorizado (falta o es inválido el header Authorization)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error: { type: string, example: no autorizado : falta header Authorization }
+
+  # -------- Productos: CREATE (POST) y LIST (GET) en /api/products --------
+  /api/products:
+    get:
+      summary: Listar productos
+      description: Devuelve un array con todos los productos en memoria.
+      responses:
+        '200':
+          description: OK (devuelve lista)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object      # describe cada elemento del array
+                  properties:
+                    id:     { type: integer, example: 1 }
+                    nombre: { type: string,  example: Flat White }
+                    precio: { type: number,  example: 4000 }
+
+    post:
+      summary: Crear nuevo producto
+      description: Crea un producto en memoria (id autoincremental).
+      requestBody:                # lo que el servidor espera en el body de la request
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nombre, precio]   # campos obligatorios
+              properties:
+                nombre: { type: string, example: Flat White }
+                precio: { type: number, example: 4000 }
+      responses:
+        '201':
+          description: Producto creado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:     { type: integer, example: 1 }
+                  nombre: { type: string,  example: Flat White }
+                  precio: { type: number,  example: 4000 }
+        '400':
+          description: Datos inválidos o faltantes
+
+  # -------- Productos por ID: READ / UPDATE / DELETE en /api/products/{id} --------
+  /api/products/{id}:
+    parameters:                    # parámetros comunes a los 3 métodos (path param :id)
+      - in: path
+        name: id
+        required: true
+        schema: { type: integer, example: 1 }
+        description: ID numérico del producto
+
+    get:
+      summary: Obtener producto por id
+      responses:
+        '200':
+          description: OK (devuelve el producto encontrado)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:     { type: integer, example: 1 }
+                  nombre: { type: string,  example: Flat White }
+                  precio: { type: number,  example: 4000 }
+        '404':
+          description: No encontrado
+
+    put:
+      summary: Actualizar producto por id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nombre, precio]
+              properties:
+                nombre: { type: string, example: Latte }
+                precio: { type: number, example: 3500 }
+      responses:
+        '200':
+          description: Actualizado (devuelve el producto modificado)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:     { type: integer, example: 1 }
+                  nombre: { type: string,  example: Latte }
+                  precio: { type: number,  example: 3500 }
+        '400':
+          description: Datos inválidos
+        '404':
+          description: No encontrado
+
+    delete:
+      summary: Eliminar producto por id
+      responses:
+        '204':
+          description: Borrado (sin contenido)
+        '404':
+          description: No encontrado
+
+# ====== COMPONENTES: definimos el esquema de seguridad Bearer (para el botón Authorize) ======
+components:
+  securitySchemes:
+    bearerAuth:            # nombre que referenciamos en "security"
+      type: http
+      scheme: bearer       # tipo Bearer (header Authorization: Bearer <token>)
+      bearerFormat: JWT    # informativo (podría ser "JWT" o "string")
+
+# Seguridad global: Swagger ofrecerá el botón "Authorize" y recordará el token
+security:
+  - bearerAuth: []
