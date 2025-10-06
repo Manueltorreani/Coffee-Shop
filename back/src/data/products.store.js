@@ -11,6 +11,47 @@ export async function list(){
     return prisma.product.findMany({orderBy : {id : 'asc'}})
 }
 
+function buildWhere({ nombre }) {
+  const where = {}
+  if (nombre) {
+    where.nombre = { contains: nombre }
+  }
+  return where
+}
+
+export async function countFiltered({nombre}) {
+  const where = buildWhere({nombre})
+  return prisma.product.count({where})
+}
+
+
+//Lista productos con filtros y paginación.
+export async function listFiltered({
+    nombre,
+    skip,
+    take,
+    sortBy = 'id',     // campo por el cual ordenar (por defecto: id)
+    sortOrder = 'asc', // dirección de orden ('asc' o 'desc')
+  }) {
+    const where = buildWhere({ nombre })
+
+    // 🧱 Seguridad: permitimos solo ciertos campos para ordenar.
+    // Esto evita inyección o errores si alguien manda "sortBy=algoRaro"
+    const allowedSortBy = new Set(['id', 'nombre', 'precio'])
+    if (!allowedSortBy.has(sortBy)) sortBy = 'id'
+
+    // Aseguramos que sortOrder solo sea "asc" o "desc"
+    const order = (sortOrder === 'desc') ? 'desc' : 'asc'
+
+    // 🔎 Consulta a BD con Prisma (asíncrona)
+    return prisma.product.findMany({
+      where,              // objeto dinámico con filtros
+      skip,               // saltea N registros (paginación)
+      take,               // trae N registros (tamaño de página)
+      orderBy: { [sortBy]: order } // orden dinámico por campo y dirección
+    })
+}
+
 // Buscar un producto por su ID
 export  async function getById(id){
     // find devuelve el primer elemento que cumple la condición

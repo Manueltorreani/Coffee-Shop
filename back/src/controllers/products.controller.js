@@ -1,10 +1,64 @@
 //importamos todas las funciones del "store" de memoria
 import *as store from '../data/products.store.js'
 
-//listamos los productos
-export const listProducts =  async ( req,res)=>{
-    const items = await store.list()
-    res.json(items)
+//listamos los productos con query params 
+ /*//- Leer los query params: nombre, page, limit, sortBy, sortOrder.
+ //*  - Validarlos y convertirlos a número si hace falta.
+ //*  - Calcular la paginación (skip/take).
+ //*  - Consultar al store (Prisma) por los datos filtrados y ordenados.
+   - Devolver la lista + metadatos de paginación.*/
+export const listProducts = async (req, res) => {
+  try {
+    
+    const { nombre, sortBy, sortOrder } = req.query //  Extraemos los parámetros de la URL (query params)
+
+    // Si el usuario no pasa limit o page, usamos valores por defecto.
+    const limit = req.query.limit ? Number(req.query.limit) : 10
+    const page  = req.query.page  ? Number(req.query.page)  : 1
+
+    // . Validaciones básicas para evitar valores inválidos
+    if (Number.isNaN(limit) || limit <= 0) {
+      return res.status(400).json({ error: 'El parámetro "limit" debe ser un número mayor que 0' })
+    }
+    if (Number.isNaN(page) || page <= 0) {
+      return res.status(400).json({ error: 'El parámetro "page" debe ser un número mayor que 0' })
+    }
+    //  . Calcular los valores para paginación
+    const take = Math.min(limit, 100)     // Límite de seguridad (máx. 100 por página)
+    const skip = (page - 1) * take        // Cuántos registros saltar (ej: page 2, limit 10 → skip 10)
+
+    // . Consultamos la cantidad total de productos que cumplen el filtro
+    const total = await store.countFiltered({ nombre }) // cuenta cuántos cumplen el filtro "nombre"
+    const totalPages = Math.max(1, Math.ceil(total / take)) // calculamos el total de páginas
+    // Si el usuario pide una página fuera de rango, devolvemos vacío pero meta correcta
+    if (page > totalPages) {
+      return res.json({
+        items: [],
+        meta: { total, page, limit: take, totalPages }
+      })
+    }
+    //  Obtenemos los productos filtrados + ordenados desde el store
+    const items = await store.listFiltered({
+      nombre,
+      skip,
+      take,
+      sortBy,
+      sortOrder
+    })
+    //  Respondemos al cliente 
+    return res.json({
+      items, // array de productos devuelto por Prisma
+      meta: { // metadatos útiles para el frontend
+        total,       // total de productos que cumplen el filtro
+        page,        // página actual
+        limit: take, // cantidad por página
+        totalPages   // páginas totales
+      }
+    })
+  } catch (err) {
+    console.error('ERROR listProducts ->', err)
+    res.status(500).json({ error: 'Error interno del servidor' })
+  }
 }
 
 //obtenemos producto por id 
