@@ -59,6 +59,7 @@ export default function ProductsPage(){
     const handleSortChange = ({ sortBy, sortOrder}) => {
         setSortBy(sortBy)
         setSortOrder(sortOrder)
+        setPage(1) 
     }
 
     //cuando el usuario pulsa anterior/siguiente
@@ -93,9 +94,9 @@ export default function ProductsPage(){
       {!loading && !error && (
         <>
           <ProductTable items={items} />
-          <Pagination page={meta.page} totalPages={meta.totalPages} onPageChange={handlePageChange} />
+          <Pagination page={page} totalPages={meta.totalPages} onPageChange={handlePageChange} />
           <p style={{ marginTop: 8, color: '#555' }}>
-            Total: {meta.total} &middot; Página {meta.page}/{meta.totalPages}
+            Total: {meta.total} &middot; Página {page}/{meta.totalPages}
           </p>
         </>
       )}
