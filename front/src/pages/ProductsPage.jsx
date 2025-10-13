@@ -4,6 +4,8 @@ import SearchBar from "../components/SearchBar";//barra de busqueda
 import SortControls from "../components/SortControl";
 import ProductTable from "../components/ProductTable";
 import Pagination from "../components/Pagination";
+import { createProduct, updateProduct, deleteProduct } from "../api/products";
+import ProductForm from "../components/ProductForm";
 
 export default function ProductsPage(){
     //estado de filtros y orden
@@ -12,6 +14,8 @@ export default function ProductsPage(){
     const [limit, setLimit]= useState(5) // tamaño por pagina , items por pagina
     const [sortBy, setSortBy] = useState('id') //campo de orden
     const [sortOrder, setSortOrder] = useState('asc')
+    const [editing, setEditing] = useState(null)
+
 
     //estado de datos y UI
     const [items, setItems]= useState([]) //array de productos de la pagina
@@ -68,7 +72,23 @@ export default function ProductsPage(){
      return (
     <div style={{ maxWidth: 900, margin: '40px auto', padding: '0 12px' }}>
       <h1>Productos</h1>
-
+      {editing ? (
+    <ProductForm
+      initialData={editing}
+      onSave={async (data) => {
+        if (editing.id) {
+          await updateProduct(editing.id, data)
+        } else {
+          await createProduct(data)
+        }
+        setEditing(null)
+        load() // recargar lista
+      }}
+      onCancel={() => setEditing(null)}
+        />
+      ) : (
+      <button onClick={() => setEditing({})}>➕ Nuevo producto</button>
+    )}
       {/* Barra de búsqueda controlada (onSearch dispara setNombre) */}
       <SearchBar defaultValue={nombre} onSearch={handleSearch} />
 
@@ -93,7 +113,16 @@ export default function ProductsPage(){
       {/* Si no estamos cargando ni en error, mostramos tabla y paginación */}
       {!loading && !error && (
         <>
-          <ProductTable items={items} />
+          <ProductTable 
+          items={items} 
+           onEdit={(p) => setEditing(p)}
+           onDelete={async (id) => {
+              if (confirm("¿Seguro que deseas eliminar este producto?")) {
+                await deleteProduct(id)
+                load()
+              }
+            }}
+          />
           <Pagination page={page} totalPages={meta.totalPages} onPageChange={handlePageChange} />
           <p style={{ marginTop: 8, color: '#555' }}>
             Total: {meta.total} &middot; Página {page}/{meta.totalPages}
