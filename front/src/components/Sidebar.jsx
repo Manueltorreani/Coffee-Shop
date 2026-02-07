@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import { useAuth } from '../context/AuthContext.jsx'
 
     const linkStyle = {
         display : 'flex', alignItems:'center', gap:10,
@@ -6,6 +7,8 @@ import { NavLink } from "react-router-dom";
     }
 
     export default function Sidebar (){
+      const { user } = useAuth()
+       if (!user) return null
 
         return (
     <div style={{ padding:16 }}>
@@ -17,6 +20,7 @@ import { NavLink } from "react-router-dom";
         }} />
         <strong>Coffee Admin</strong>
       </div>
+      Hola {user.nombre}
 
       <nav style={{ display:'grid', gap:6 }}>
         <NavLink to="/" end

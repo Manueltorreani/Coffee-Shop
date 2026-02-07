@@ -4,8 +4,11 @@ import cors from 'cors'
 import swaggerUi from 'swagger-ui-express'
 import YAML from 'yamljs'
 
-// 1) Router de productos (usa controllers + store/Prisma)
+// 1) Routers (usa controllers + store/Prisma) 
+// de productos, auth y orders
+import authRouter from './routes/auth.routes.js'
 import productsRouter from './routes/products.routes.js'
+import ordersRouter from './routes/orders.routes.js'
 
 const app = express()
 const PORT = 3001
@@ -48,10 +51,13 @@ app.use(
   swaggerUi.setup(swaggerDoc, { swaggerOptions: { persistAuthorization: true } })
 )
 
-// 4.b) Rutas de productos (CRUD real con Prisma)
-app.use('/api/products', productsRouter)
+// 4.b) Rutas
 
-// 4.c) Endpoints de ejemplo / utilitarios
+app.use('/api/auth', authRouter)       // Login y Register, Update, Delete
+app.use('/api/products', productsRouter) // Productos (ahora protegidas las de escritura)
+app.use('/api/orders', ordersRouter)     // Pedidos (protegidas con JWT)
+
+// 4.c) Endpoints de ejemplo / utilitarios para testear salud servidor
 app.get('/api/hello', (_req, res) => {
   res.json({ message: 'Hola Manu tu servidor funciona' })
 })
