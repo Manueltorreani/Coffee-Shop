@@ -1,43 +1,102 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { isAuthenticated } from './lib/auth.js'
-import DashboardLayout from './layouts/DashboardLayout.jsx'
 import LoginPage from './pages/LoginPage.jsx'
+import CartaPage from './pages/CartaPage.jsx'
+import DashboardLayout from './layouts/DashboardLayout.jsx'
 
-// Tus páginas reales
 import ProductsPage from './pages/ProductsPage.jsx'
 import VentasPage from './pages/VentasPage.jsx'
 import CajaPage from './pages/CajaPage.jsx'
 import GastosPage from './pages/GastosPage.jsx'
 import ConfigPage from './pages/ConfigPage.jsx'
 
-//pequeño wrapper de ruta protegida 
-function PrivateRoute({children}){
-  return isAuthenticated() ? children: <Navigate to ="/login" replace />
+import { useAuth } from './context/AuthContext.jsx'
+
+// Guards
+function ProtectedRoute({ children }) {
+  const auth = useAuth()
+
+  if (!auth || auth.loading) {
+    return <div>Cargando...</div>
+  }
+
+  if (!auth.user) {
+    return <Navigate to="/login" replace />
+  }
+
+  return children
+}
+
+function AdminRoute({ children }) {
+  const { user } = useAuth()
+
+  if (!user?.isAdmin) return <Navigate to="/" replace />
+
+  return children
 }
 
 export default function App() {
   return (
     <Routes>
-      {/*login publico */}
-      <Route path='/login' element={<LoginPage/>} />
-      {/* dashboard protegido : todo lo que cuelga de "/" requiere login   */}
-       <Route
+
+      {/* Public */}
+      <Route path="/login" element={<LoginPage />} />
+
+      {/* Protegido */}
+      <Route
         path="/"
         element={
-          <PrivateRoute>
+          <ProtectedRoute>
             <DashboardLayout />
-          </PrivateRoute>
+          </ProtectedRoute>
         }
       >
-        {/* Ruta por defecto dentro del layout */}
-        <Route index element={<ProductsPage />} />
-        <Route path="ventas" element={<VentasPage />} />
-        <Route path="caja" element={<CajaPage />} />
-        <Route path="gastos" element={<GastosPage />} />
-        <Route path="config" element={<ConfigPage />} />
+        {/* INDEX → CARTA (todos) */}
+        <Route index element={<CartaPage />} />
+
+        {/* ADMIN */}
+        <Route
+          path="products"
+          element={
+            <AdminRoute>
+              <ProductsPage />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="ventas"
+          element={
+            <AdminRoute>
+              <VentasPage />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="caja"
+          element={
+            <AdminRoute>
+              <CajaPage />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="gastos"
+          element={
+            <AdminRoute>
+              <GastosPage />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="config"
+          element={
+            <AdminRoute>
+              <ConfigPage />
+            </AdminRoute>
+          }
+        />
       </Route>
 
-      {/* Fallback */}
+      {/* fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
