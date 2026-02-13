@@ -28,6 +28,7 @@ export default function DashboardLayout() {
   return (
     <div
       style={{
+<<<<<<< HEAD
         display: 'grid',
         gridTemplateColumns: '260px 1fr',
         gridTemplateRows: '64px 1fr',
@@ -35,19 +36,38 @@ export default function DashboardLayout() {
                             "sidebar main"`,
         height: '100vh',
          width :'100%',
+=======
+        display: 'flex',
+        flexDirection: 'row',
+        width: '100%',
+        height: '100%',
+>>>>>>> 50c91e5a01ae40871dd847234b3716ac6cf12d35
       }}
     >
       {/* Sidebar */}
       <aside
         style={{
-          gridArea: 'sidebar',
+          width: 240,
           borderRight: `1px solid var(--border)`,
           background: '#fff',
         }}
       >
         <Sidebar />
       </aside>
+      <div style={{ display:'flex', flexDirection:'column', width:'100%'}} >
+        {/* Topbar */}
+        <header
+          style={{
+            width: '100%',
+            height: 60,
+            borderBottom: `1px solid var(--border)`,
+            background: '#fff',
+          }}
+        >
+          <Topbar onLogout={handleLogout} />
+        </header>
 
+<<<<<<< HEAD
       {/* Topbar */}
       <header
         style={{
@@ -59,19 +79,23 @@ export default function DashboardLayout() {
       >
         <Topbar onLogout={handleLogout} />
       </header>
+=======
+        {/* Main */}
+        <main
+          style={{
+            width: '100%',
+            height: '100%',
+            padding: '20px',
+            overflow: 'auto',
+          }}
+        >
+          <div className="card" style={{ padding: 20 }}>
+            <Outlet />
+          </div>
+        </main>
+      </div>
+>>>>>>> 50c91e5a01ae40871dd847234b3716ac6cf12d35
 
-      {/* Main */}
-      <main
-        style={{
-          gridArea: 'main',
-          padding: '20px',
-          overflow: 'auto',
-        }}
-      >
-        <div className="card" style={{ padding: 20 }}>
-          <Outlet />
-        </div>
-      </main>
     </div>
   )
 }
