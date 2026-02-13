@@ -30,7 +30,7 @@ app.use(
   })
 )
 
-// 3.c) Logger simple (útil para ver qué llega y con qué body)
+// 3.c) Logger simple (útil para ver qué llega y con qué body) -> (para ver que llega el token en headers, por ejemplo o ver que manda el front)
 app.use((req, res, next) => {
   const now = new Date().toISOString()
   const origin = req.headers.origin || 'sin-origin'
@@ -39,7 +39,9 @@ app.use((req, res, next) => {
   if (req.method === 'POST' || req.method === 'PUT') {
     console.log('Body recibido:', req.body)
   }
-  next()
+
+  // Continuamos al siguiente middleware o ruta
+  next()// Sin esto, el request se quedaría colgado y no llegaría a las rutas
 })
 
 // 4) Rutas de la API
@@ -53,8 +55,8 @@ app.use(
 
 // 4.b) Rutas
 
-app.use('/api/auth', authRouter)       // Login y Register, Update, Delete
-app.use('/api/products', productsRouter) // Productos (ahora protegidas las de escritura)
+app.use('/api/auth', authRouter)       // Login y Register, Update, Delete (protegidas update y delete con JWT)
+app.use('/api/products', productsRouter) // Productos (protegidas las de escritura con JWT)
 app.use('/api/orders', ordersRouter)     // Pedidos (protegidas con JWT)
 
 // 4.c) Endpoints de ejemplo / utilitarios para testear salud servidor

@@ -54,3 +54,22 @@ model OrderItem {
   cantidad  Int
   precio    Float   // guardamos el precio histórico del producto en el momento del pedido
 }
+
+model Gastos {
+  id          Int         @id @default(autoincrement())
+  nombre      String
+  precio      Float       //historico del precio del gasto
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  tipoGastos  TipoGasto[] // Relación inversa
+}
+
+model TipoGasto {
+  id          Int         @id @default(autoincrement())
+  nombre      String
+  precio      Float
+  gastosId  Int?        // Relación opcional por ahora
+  gastos    Gastos?   @relation(fields: [gastosId], references: [id])
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
