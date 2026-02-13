@@ -8,7 +8,9 @@ export const register = async (req, res) => {
     
     const existing = await prisma.user.findUnique({ where: { email } })
     if (existing) return res.status(400).json({ error: 'El email ya está registrado' })
-
+    if (password .length < 6) {
+      return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres' })
+    }
     const hashedPassword = await hashPassword(password)
     
     // 1. Creamos el usuario

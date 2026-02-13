@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { saveToken } from "../lib/auth";
 import { login, register } from '../services/auth.service'
@@ -14,6 +14,9 @@ export default function LoginPage(){
     const navigate = useNavigate()
     const[isRegister, setIsRegister] = useState(false)
     const { setUser } = useAuth()
+
+    useEffect(() => { window.alert("Login Page loaded")}, [])
+    useEffect(() => { window.alert("Cambio de modo, ahora registrarse esta en: " + isRegister)}, [isRegister,email])
 
     const handleLogin = async (e) => {
       e.preventDefault()

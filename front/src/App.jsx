@@ -11,12 +11,12 @@ import ConfigPage from './pages/ConfigPage.jsx'
 
 import { useAuth } from './context/AuthContext.jsx'
 
-// Guards
+// Guards -> Rutas protegidas y rutas solo para admin
 function ProtectedRoute({ children }) {
   const auth = useAuth()
 
   if (!auth || auth.loading) {
-    return <div>Cargando...</div>
+    return <div>Cargando...</div> // podriamos poner una tuerquita o algo mientras se verifica el estado de autenticación (por ejemplo, si el token es valido o no)
   }
 
   if (!auth.user) {

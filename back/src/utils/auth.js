@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
-const SECRET = process.env.JWT_SECRET || "mi_secreto_super_seguro" // ¡Usa .env!
+const SECRET = process.env.JWT_SECRET || "mi_secreto_super_seguro" // Mientras mas largo y complejo, mejor. En producción, usaria una variable de entorno y no hardcodear el secreto.
 
 // Encriptar contraseña -> libreria bcryptjs es un hasheo unidireccional de complejidad 10
 // se usa hasheo porque es mas seguro que un cifrado (no se puede desencriptar)
@@ -17,6 +17,15 @@ export const comparePassword = async (password, hash) => {
 
 // Generar Token JWT
 export const generateToken = (user) => {
+ 
+  // El token JWT tiene 3 partes: header, payload y signature
+  // yyyyy.xxxxx.zzzzz
+ 
+  // el header por defecto en esta libreria es { alg: "HS256", typ: "JWT" }
+  // el payload es el objeto que queremos guardar (en este caso id, email e isAdmin)
+  // el signature se genera con el header, payload y el secreto (SECRET), es para
+    // verificar que el token no ha sido modificado y que fue generado por nuestro servidor
+
   return jwt.sign(
     { id: user.id, email: user.email, isAdmin: user.isAdmin },
     SECRET,
@@ -28,6 +37,7 @@ export const generateToken = (user) => {
 export const verifyToken = (req, res, next) => {
   const authHeader = req.headers['authorization']
   // El header viene como "Bearer <token>"
+  // Extraemos el token -> Authorization: Bearer <token>
   const token = authHeader && authHeader.split(' ')[1]
 
   if (!token) return res.status(401).json({ error: 'Acceso denegado. Falta token.' })
