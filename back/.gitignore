@@ -1,5 +1,8 @@
 node_modules
-# Keep environment variables out of version control
+# para que no se suban los node_modules al repositorio, ya que son pesados y se pueden instalar con npm install
+
 .env
+# para que no se suba el archivo de variables de entorno, que puede contener información sensible como el secreto del JWT o la URL de la base de datos
 
 /src/generated/prisma
+# para que no se suba el código generado por Prisma, que es específico de cada entorno y se puede regenerar con prisma generate

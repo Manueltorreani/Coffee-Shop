@@ -4,8 +4,11 @@ import cors from 'cors'
 import swaggerUi from 'swagger-ui-express'
 import YAML from 'yamljs'
 
-// 1) Router de productos (usa controllers + store/Prisma)
+// 1) Routers (usa controllers + store/Prisma) 
+// de productos, auth y orders
+import authRouter from './routes/auth.routes.js'
 import productsRouter from './routes/products.routes.js'
+import ordersRouter from './routes/orders.routes.js'
 
 const app = express()
 const PORT = 3001
@@ -27,7 +30,7 @@ app.use(
   })
 )
 
-// 3.c) Logger simple (útil para ver qué llega y con qué body)
+// 3.c) Logger simple (útil para ver qué llega y con qué body) -> (para ver que llega el token en headers, por ejemplo o ver que manda el front)
 app.use((req, res, next) => {
   const now = new Date().toISOString()
   const origin = req.headers.origin || 'sin-origin'
@@ -36,7 +39,9 @@ app.use((req, res, next) => {
   if (req.method === 'POST' || req.method === 'PUT') {
     console.log('Body recibido:', req.body)
   }
-  next()
+
+  // Continuamos al siguiente middleware o ruta
+  next()// Sin esto, el request se quedaría colgado y no llegaría a las rutas
 })
 
 // 4) Rutas de la API
@@ -48,10 +53,13 @@ app.use(
   swaggerUi.setup(swaggerDoc, { swaggerOptions: { persistAuthorization: true } })
 )
 
-// 4.b) Rutas de productos (CRUD real con Prisma)
-app.use('/api/products', productsRouter)
+// 4.b) Rutas
 
-// 4.c) Endpoints de ejemplo / utilitarios
+app.use('/api/auth', authRouter)       // Login y Register, Update, Delete (protegidas update y delete con JWT)
+app.use('/api/products', productsRouter) // Productos (protegidas las de escritura con JWT)
+app.use('/api/orders', ordersRouter)     // Pedidos (protegidas con JWT)
+
+// 4.c) Endpoints de ejemplo / utilitarios para testear salud servidor
 app.get('/api/hello', (_req, res) => {
   res.json({ message: 'Hola Manu tu servidor funciona' })
 })
