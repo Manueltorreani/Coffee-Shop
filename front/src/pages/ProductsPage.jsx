@@ -70,7 +70,7 @@ export default function ProductsPage(){
     const handlePageChange = (p) => setPage(p)
 
      return (
-    <div style={{ maxWidth: 900, margin: '40px auto', padding: '0 12px' }}>
+    <div style={{  width :'100%', margin: '40px auto', padding: '0 12px' }}>
       <h1>Productos</h1>
       {editing ? (
     <ProductForm

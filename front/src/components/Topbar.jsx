@@ -8,7 +8,7 @@ export default function Topbar({ userName = 'admin', onLogout }) {
      return(
         <div style={{
       height:'100%', display:'flex', alignItems:'center',
-      justifyContent:'space-between', padding:'0 16px'
+      justifyContent:'space-between', padding:'0 16px', width: "100%"
     }}>
       {/* Breadcrumb / título contextual (simple por ahora) */}
       <div style={{ color:'var(--muted)' }}>Panel</div>

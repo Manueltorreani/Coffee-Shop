@@ -34,6 +34,7 @@ export default function DashboardLayout() {
         gridTemplateAreas: `"sidebar topbar"
                             "sidebar main"`,
         height: '100vh',
+         width :'100%',
       }}
     >
       {/* Sidebar */}
@@ -53,6 +54,7 @@ export default function DashboardLayout() {
           gridArea: 'topbar',
           borderBottom: `1px solid var(--border)`,
           background: '#fff',
+          width :'100%',
         }}
       >
         <Topbar onLogout={handleLogout} />
