@@ -1,6 +1,6 @@
 import { Router } from "express"
 import { verifyToken, verifyAdmin } from '../utils/auth.js' // Importamos middlewares
-import { listProducts, getProduct, createProduct, updateProduct, deleteProduct } from '../controllers/products.controller.js'
+import { listProducts, getProduct, createProduct, updateProduct, deleteProduct, getCategory } from '../controllers/products.controller.js'
 
 //importamos los controladores en products.controller.js
 //creamos un ruter ( subconjunto de rutas )
@@ -11,6 +11,8 @@ const router = Router()
 
 //GET /api/products -> lista todas 
 router.get('/', listProducts)
+router.get('/cat', getCategory)
+
 //GET /api/products/ :id -> un producto especifico
 router.get('/:id', getProduct)
 

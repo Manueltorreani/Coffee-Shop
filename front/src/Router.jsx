@@ -13,13 +13,11 @@ import { useAuth } from './context/AuthContext.jsx'
 
 // Guards -> Rutas protegidas y rutas solo para admin
 function ProtectedRoute({ children }) {
-  const auth = useAuth()
+  const { user, loading } = useAuth()
 
-  if (!auth || auth.loading) {
-    return <div>Cargando...</div> // podriamos poner una tuerquita o algo mientras se verifica el estado de autenticación (por ejemplo, si el token es valido o no)
-  }
+  if (loading) return <div>Cargando permisos...</div>
 
-  if (!auth.user) {
+  if (!user) {
     return <Navigate to="/login" replace />
   }
 
@@ -27,9 +25,14 @@ function ProtectedRoute({ children }) {
 }
 
 function AdminRoute({ children }) {
-  const { user } = useAuth()
+  const { user, loading } = useAuth()
 
-  if (!user?.isAdmin) return <Navigate to="/" replace />
+  if (loading) return <div>Cargando permisos...</div> // ¡Crucial!
+
+  /*if (!user || !user.isAdmin) {*/
+  if (!user) {
+    return <Navigate to="/" replace />
+  }
 
   return children
 }

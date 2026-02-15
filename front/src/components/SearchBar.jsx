@@ -27,8 +27,9 @@ export default function SearchBar({ defaultValue = "", onSearch }) {
         onChange={(e) => setText(e.target.value)} // actualiza el estado con cada tecla
         placeholder="Buscar por nombre..."
         style={{ padding: 8, flex: 1 }}
+        className="border-2 border-blue-500 rounded-full"
       />
-      <button type="submit" style={{ padding: "8px 12px" }}>
+      <button type="submit" style={{ padding: "8px 12px" }} className="bg-blue-500 text-white hover:bg-blue-700">
         Buscar
       </button>
     </form>

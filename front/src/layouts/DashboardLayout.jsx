@@ -16,14 +16,14 @@ export default function DashboardLayout() {
   }
 
   // 🔁 Redirección por rol
-  useEffect(() => {
+  /*useEffect(() => {
     if (!user) return
 
     // Usuario normal → solo carta
     if (!user.isAdmin && window.location.pathname !== '/') {
       navigate('/', { replace: true })
     }
-  }, [user, navigate])
+  }, [user, navigate])*/
 
   return (
     <div
@@ -56,7 +56,7 @@ export default function DashboardLayout() {
             background: '#fff',
           }}
         >
-          <Topbar onLogout={handleLogout} />
+          <Topbar userName={user?.nombre || 'usuario'} onLogout={handleLogout} />
         </header>
 
 
@@ -74,6 +74,7 @@ export default function DashboardLayout() {
           </div>
         </main>
       </div>
+
     </div>
   )
 }

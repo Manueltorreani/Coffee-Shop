@@ -16,7 +16,6 @@ export default function LoginPage(){
     const { setUser } = useAuth()
 
 
-  
 
     const handleLogin = async (e) => {
       e.preventDefault()

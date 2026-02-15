@@ -1,4 +1,5 @@
 import * as store from '../data/products.store.js'
+import { prisma } from '../lib/prisma.js'
 
 // 1. Listar productos con filtros y paginación
 export const listProducts = async (req, res) => {
@@ -63,6 +64,7 @@ export const createProduct = async (req, res) => {
 
     if (!nombre || typeof nombre !== 'string') return res.status(400).json({ error: 'nombre requerido (string)' })
     if (typeof precio !== 'number') return res.status(400).json({ error: 'precio requerido (number)' })
+    if (typeof categoryId !== 'number') return res.status(400).json({ error: 'categoryId requerido (number)' })
 
     const nuevo = await store.create({ nombre, precio, categoryId })
     return res.status(201).json(nuevo)
@@ -109,4 +111,10 @@ export const deleteProduct = async (req, res) => {
         console.error('ERROR deleteProduct ->', err)
         res.status(500).json({ error: "Error interno al intentar eliminar" })
     }
+}
+
+// Obtener categorias
+export const getCategory = async (req, res) => {
+    const cat = await prisma.category.findMany()
+    res.json(cat)
 }
