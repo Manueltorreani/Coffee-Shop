@@ -6,6 +6,7 @@ import ProductTable from "../components/ProductTable";
 import Pagination from "../components/Pagination";
 import { createProduct, updateProduct, deleteProduct } from "../api/products";
 import ProductForm from "../components/ProductForm";
+import { fetchCategories } from "../api/products";
 
 export default function ProductsPage(){
     //estado de filtros y orden
@@ -27,6 +28,15 @@ export default function ProductsPage(){
     }) //metadatos que manda el backend
     const[loading, setLoading] = useState(false) // spinner, indicador de carga
     const[error, setError] = useState('') //mensaje de error
+
+    async function loadCategories() {
+        try {
+          const categories = await fetchCategories()
+          console.log('Categorías:', categories)
+        } catch (err) {
+          console.error('Error al cargar categorías:', err)
+        }
+      }
 
     //funcion que llama al backend
     async function load(){
@@ -70,24 +80,27 @@ export default function ProductsPage(){
     const handlePageChange = (p) => setPage(p)
 
      return (
-    <div style={{  width :'100%', margin: '40px auto', padding: '0 12px' }}>
+    <div className="w-full gap-5 flex flex-col" style={{margin: '40px auto', padding: '0 12px'}}>
       <h1>Productos</h1>
       {editing ? (
-    <ProductForm
-      initialData={editing}
-      onSave={async (data) => {
-        if (editing.id) {
-          await updateProduct(editing.id, data)
-        } else {
-          await createProduct(data)
-        }
-        setEditing(null)
-        load() // recargar lista
-      }}
-      onCancel={() => setEditing(null)}
-        />
+      <>
+        <h2>{editing.id ? 'Editando producto: ' + editing.nombre : 'Creando nuevo producto'}</h2>
+        <ProductForm
+          initialData={editing}
+          onSave={async (data) => {
+            if (editing.id) {
+              await updateProduct(editing.id, data)
+            } else {
+              await createProduct(data)
+            }
+            setEditing(null)
+            load() // recargar lista
+          }}
+          onCancel={() => setEditing(null)}
+      />
+      </>
       ) : (
-      <button onClick={() => setEditing({})}>➕ Nuevo producto</button>
+      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={() => setEditing({})}>➕ Nuevo producto</button>
     )}
       {/* Barra de búsqueda controlada (onSearch dispara setNombre) */}
       <SearchBar defaultValue={nombre} onSearch={handleSearch} />
@@ -129,6 +142,7 @@ export default function ProductsPage(){
           </p>
         </>
       )}
+      <button onClick={loadCategories}>Cargar categorias</button>
     </div>
   )
 

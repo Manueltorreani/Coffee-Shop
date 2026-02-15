@@ -1,9 +1,10 @@
 const BASE_URL_AUTH = 'http://localhost:3001/api/auth';
 const BASE_URL_ORDERS = 'http://localhost:3001/api/orders';
+import { getToken } from "../../lib/auth";
 //TODO REVISAR
 const getAuthHeaders = () => ({
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${localStorage.getItem('token')}`
+    'Authorization': `Bearer ${getToken()}`
 });
 
 // 1. Obtener estadísticas de ventas (Ingresos totales)

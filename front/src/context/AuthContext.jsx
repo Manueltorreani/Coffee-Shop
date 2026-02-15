@@ -13,15 +13,21 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const init = async () => {
-      if (!getToken()) {
+      const token = getToken();
+      console.log("1. Token encontrado:", token); // DEBUG
+
+      if (!token) {
         setLoading(false)
         return
       }
 
       try {
+        console.log("2. Llamando a getMe..."); // DEBUG
         const me = await getMe()
+        console.log("3. getMe respondió éxito:", me); // DEBUG
         setUser(me)
-      } catch {
+      } catch (error) {
+        console.error("4. Error en getMe:", error); // DEBUG
         clearToken()
         setUser(null)
       } finally {

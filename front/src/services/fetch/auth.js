@@ -1,4 +1,5 @@
 const BASE_URL = 'http://localhost:3001/api/auth';
+import { getToken } from "../../lib/auth";
 
 //TODO REVISAR
 
@@ -6,7 +7,7 @@ const BASE_URL = 'http://localhost:3001/api/auth';
  * Función auxiliar para obtener el token del localStorage
  */
 const getAuthHeaders = () => {
-    const token = localStorage.getItem('token');
+    const token = getToken();
     return {
         'Content-Type': 'application/json',
         'Authorization': token ? `Bearer ${token}` : ''

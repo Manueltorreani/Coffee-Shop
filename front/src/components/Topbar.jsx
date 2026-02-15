@@ -1,4 +1,4 @@
-export default function Topbar({ userName = 'admin', onLogout }) {
+ export default function Topbar({ userName = 'usuario', onLogout }) {
   // opcional: avisá si no vino la prop
   if (typeof onLogout !== 'function') {
     console.warn('Topbar: onLogout no fue provisto');
@@ -16,6 +16,7 @@ export default function Topbar({ userName = 'admin', onLogout }) {
       {/* Acciones a la derecha */}
       <div style={{ display:'flex', alignItems:'center', gap:12 }}>
         <span style={{ color:'var(--muted)' }}>{now}</span>
+        Hola {userName}
         <div className="btn" onClick={onLogout}>Salir</div>
       </div>
     </div>

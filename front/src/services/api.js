@@ -1,8 +1,10 @@
+import { getToken} from "../lib/auth"
+
 const API_URL = 'http://localhost:3001/api'
 
 // Helper genérico
 export const apiFetch = async (endpoint, options = {}) => {
-  const token = localStorage.getItem('token')
+  const token = getToken();
 
   const config = {
     headers: {

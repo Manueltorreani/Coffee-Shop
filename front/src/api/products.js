@@ -1,4 +1,5 @@
 import { get } from "./client";
+import { getToken } from "../lib/auth";
 
 //llama a get api/products pasando filtros/paginacion orden con query params
 // el backend devuelve {items, meta}
@@ -18,7 +19,10 @@ export function fetchProducts({
 export async function createProduct(data) {
     const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products`,{
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getToken()}`
+        },
         body: JSON.stringify(data)
     })
     if (!res.ok) throw new Error ('error al crear producto')
@@ -29,7 +33,10 @@ export async function createProduct(data) {
 export async function updateProduct(id,data){
     const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products/${id}`,{
         method: 'PUT',
-         headers: {'Content-Type': 'application/json'},
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getToken()}`
+        },
         body: JSON.stringify(data)
     })
     if (!res.ok) throw new Error ('error al actualizar producto')
@@ -40,8 +47,17 @@ export async function updateProduct(id,data){
 export async function deleteProduct(id,data){
     const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products/${id}`,{
         method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getToken()}`
+        }
        
     })
     if (!res.ok) throw new Error ('error al eliminar producto')
       return res.json()  
+}
+
+export function fetchCategories(){
+    //delegamos la construciion de la url y el fetch al helper 'get'
+    return get ('/api/products/cat')
 }

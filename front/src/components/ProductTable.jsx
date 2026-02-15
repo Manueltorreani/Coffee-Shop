@@ -29,6 +29,7 @@ export default function ProductTable({items, onEdit, onDelete}){
         <tr style={{ background: "#eee" }}>
           <th>ID</th>
           <th>Nombre</th>
+          <th>Categoria</th>
           <th>Precio</th>
           <th>Acciones</th>
         </tr>
@@ -43,6 +44,7 @@ export default function ProductTable({items, onEdit, onDelete}){
             <tr key={p.id}>
               <td>{p.id}</td>
               <td>{p.nombre}</td>
+              <td>{p.category.nombre}</td>
               <td>${p.precio}</td>
               <td>
                 <button onClick={() => onEdit(p)}>✏️ Editar</button>
