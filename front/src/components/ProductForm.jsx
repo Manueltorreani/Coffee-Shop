@@ -22,7 +22,7 @@ export default function ProductForm ({initialData, onSave, onCancel}){
         if(initialData){
             setNombre(initialData.nombre || '')
             setPrecio(initialData.precio || '')
-            setCategoria(initialData.categoriaId || 1)
+            setCategoria(initialData.categoryId || 1)
         }
     }, [initialData])
 
