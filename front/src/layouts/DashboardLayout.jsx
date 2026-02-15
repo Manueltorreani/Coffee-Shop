@@ -28,20 +28,12 @@ export default function DashboardLayout() {
   return (
     <div
       style={{
-<<<<<<< HEAD
-        display: 'grid',
-        gridTemplateColumns: '260px 1fr',
-        gridTemplateRows: '64px 1fr',
-        gridTemplateAreas: `"sidebar topbar"
-                            "sidebar main"`,
-        height: '100vh',
-         width :'100%',
-=======
+
         display: 'flex',
         flexDirection: 'row',
         width: '100%',
         height: '100%',
->>>>>>> 50c91e5a01ae40871dd847234b3716ac6cf12d35
+
       }}
     >
       {/* Sidebar */}
@@ -67,19 +59,7 @@ export default function DashboardLayout() {
           <Topbar onLogout={handleLogout} />
         </header>
 
-<<<<<<< HEAD
-      {/* Topbar */}
-      <header
-        style={{
-          gridArea: 'topbar',
-          borderBottom: `1px solid var(--border)`,
-          background: '#fff',
-          width :'100%',
-        }}
-      >
-        <Topbar onLogout={handleLogout} />
-      </header>
-=======
+
         {/* Main */}
         <main
           style={{
@@ -94,8 +74,6 @@ export default function DashboardLayout() {
           </div>
         </main>
       </div>
->>>>>>> 50c91e5a01ae40871dd847234b3716ac6cf12d35
-
     </div>
   )
 }
