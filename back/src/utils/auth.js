@@ -21,24 +21,25 @@ export const generateToken = (user) => {
   // El token JWT tiene 3 partes: header, payload y signature
   // yyyyy.xxxxx.zzzzz
  
-  // el header por defecto en esta libreria es { alg: "HS256", typ: "JWT" }
+  // el header por defecto en esta libreria es { alg: "HS256", typ: "JWT" } tipo de hasheo 
   // el payload es el objeto que queremos guardar (en este caso id, email e isAdmin)
   // el signature se genera con el header, payload y el secreto (SECRET), es para
     // verificar que el token no ha sido modificado y que fue generado por nuestro servidor
 
   return jwt.sign(
-    { id: user.id, email: user.email, isAdmin: user.isAdmin },
-    SECRET,
-    { expiresIn: '2h' } // Expira en 2 horas
+
+    { id: user.id, email: user.email, isAdmin: user.isAdmin }, // payload
+    SECRET, // + payload y header = signature
+    { expiresIn: '2h' } // Expira en 2 horas {alg: "HS256"} = HEADER
   )
 }
 
-// Middleware para verificar Token
-export const verifyToken = (req, res, next) => {
+// Middleware para verificar Token , intermediario porque sucede antes de la funcion requerida . 
+export const verifyToken = (req, res, next) => { // para funciones de express siempre tengo que poner en params req,res,(y next si es middleware)
   const authHeader = req.headers['authorization']
   // El header viene como "Bearer <token>"
   // Extraemos el token -> Authorization: Bearer <token>
-  const token = authHeader && authHeader.split(' ')[1]
+  const token = authHeader && authHeader.split(' ')[1] // split corta el arreglo para guardar token
 
   if (!token) return res.status(401).json({ error: 'Acceso denegado. Falta token.' })
 

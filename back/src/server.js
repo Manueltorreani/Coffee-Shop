@@ -19,12 +19,12 @@ const swaggerDoc = YAML.load('./swagger.yml')
 // 3) Middlewares base (el ORDEN importa)
 
 // 3.a) Parsear JSON del body ANTES de las rutas
-app.use(express.json())
+app.use(express.json()) // para que lo que yo recibo en el body lo parseo como obj js
 
-// 3.b) CORS (una sola configuración es suficiente)
+// 3.b) CORS (una sola configuración nunca es suficiente pero al menos ayuda )
 app.use(
   cors({
-    origin: 'http://localhost:5173', // tu front local
+    origin: 'http://localhost:5173', 
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   })
