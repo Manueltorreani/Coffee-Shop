@@ -24,13 +24,8 @@ app.use(express.json()) // para que lo que yo recibo en el body lo parseo como o
 // 3.b) CORS (una sola configuración nunca es suficiente pero al menos ayuda )
 app.use(
   cors({
-<<<<<<< HEAD
-    origin: 'http://localhost:5173', // tu front local
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-=======
     origin: 'http://localhost:5173', 
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
->>>>>>> a451081cda24c735c7da7cfc6415c0cfb91869f6
     allowedHeaders: ['Content-Type', 'Authorization'],
   })
 )
