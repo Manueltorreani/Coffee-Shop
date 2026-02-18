@@ -28,10 +28,12 @@ export default function DashboardLayout() {
   return (
     <div
       style={{
+
         display: 'flex',
         flexDirection: 'row',
         width: '100%',
         height: '100%',
+
       }}
       className='p-0 m-0'
     >

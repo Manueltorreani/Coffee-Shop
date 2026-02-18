@@ -16,8 +16,6 @@ export default function LoginPage(){
     const { setUser } = useAuth()
 
 
-    /*useEffect(() => { window.alert("Login Page loaded")}, [])
-    useEffect(() => { window.alert("Cambio de modo, ahora registrarse esta en: " + isRegister)}, [isRegister,email])*/
 
     const handleLogin = async (e) => {
       e.preventDefault()

@@ -5,7 +5,7 @@ import { PrismaClient } from '@prisma/client'
 const globalForPrisma = globalThis
 
 export const prisma =
-  globalForPrisma.prisma || new PrismaClient()
+  globalForPrisma.prisma || new PrismaClient()//lo hago para establecer una unica conexion .
 
 // 🔥 OJO: es process.env (con process), no ProcessingInstruction.env
 if (process.env.NODE_ENV !== 'production') {

@@ -60,41 +60,41 @@ export default function Router() {
         <Route
           path="/products"
           element={
-            <AdminRoute>
+            <ProtectedRoute>
               <ProductsPage />
-            </AdminRoute>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/ventas"
           element={
-            <AdminRoute>
+            <ProtectedRoute>
               <VentasPage />
-            </AdminRoute>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/caja"
           element={
-            <AdminRoute>
+            <ProtectedRoute>
               <CajaPage />
-            </AdminRoute>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/gastos"
           element={
-            <AdminRoute>
+            <ProtectedRoute>
               <GastosPage />
-            </AdminRoute>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/config"
           element={
-            <AdminRoute>
+            <ProtectedRoute>
               <ConfigPage />
-            </AdminRoute>
+            </ProtectedRoute>
           }
         />
       </Route>
