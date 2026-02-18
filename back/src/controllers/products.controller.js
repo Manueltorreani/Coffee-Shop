@@ -113,8 +113,56 @@ export const deleteProduct = async (req, res) => {
     }
 }
 
-// Obtener categorias
+
+export const createCategory = async (req, res) => {
+    const { nombre } = req.body
+    if (!nombre || typeof nombre !== 'string') {
+        return res.status(400).json({ error: 'nombre requerido (string)' })
+    }
+    try {
+        const nueva = await prisma.category.create({ data: { nombre } })
+        res.status(201).json(nueva)
+    } catch (err) {
+        console.error('ERROR createCategory ->', err)
+        res.status(500).json({ error: 'Error interno del servidor' })
+    }
+}
+
+export const deleteCategory = async (req, res) => {
+    const id = Number(req.params.id)
+    if (Number.isNaN(id)) return res.status(400).json({ error: "ID inválido" })
+    try {
+        await prisma.category.delete({ where: { id } })
+        res.status(204).send()
+    } catch (err) {
+        if (err.code === 'P2025') return res.status(404).json({ error: "Categoría no encontrada" })
+        console.error('ERROR deleteCategory ->', err)
+        res.status(500).json({ error: 'Error interno del servidor' })
+    }
+}
+
+export const updateCategory = async (req, res) => {
+    const id = Number(req.params.id)
+    const { nombre } = req.body
+    if (Number.isNaN(id)) return res.status(400).json({ error: "ID inválido" })
+    if (!nombre || typeof nombre !== 'string') return res.status(400).json({ error: 'nombre requerido (string)' })
+    try {
+        const updated = await prisma.category.update({ where: { id }, data: { nombre } })
+        res.json(updated)
+    }
+        catch (err) {
+        if (err.code === 'P2025') return res.status(404).json({ error: "Categoría no encontrada" })
+        console.error('ERROR updateCategory ->', err)
+        res.status(500).json({ error: 'Error interno del servidor' })
+    }
+}
+
 export const getCategory = async (req, res) => {
-    const cat = await prisma.category.findMany()
-    res.json(cat)
+    try {
+        const categories = await prisma.category.findMany()
+        res.json(categories)
+    } catch (err) {
+        console.error('ERROR getCategories ->', err)
+        res.status(500).json({ error: 'Error interno del servidor' })
+    }
 }

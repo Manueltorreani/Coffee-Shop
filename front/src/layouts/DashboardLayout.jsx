@@ -33,6 +33,7 @@ export default function DashboardLayout() {
         width: '100%',
         height: '100%',
       }}
+      className='p-0 m-0'
     >
       {/* Sidebar */}
       <aside

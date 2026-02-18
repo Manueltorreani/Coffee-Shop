@@ -27,32 +27,38 @@ model Product {
   id          Int         @id @default(autoincrement())
   nombre      String
   precio      Float
-  categoryId  Int?        // Relación opcional por ahora
+  isActive    Boolean     @default(true) // Para Soft Delete
+  categoryId  Int?
   category    Category?   @relation(fields: [categoryId], references: [id])
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
-  orderItems  OrderItem[] // Relación inversa
+  orderItems  OrderItem[]
 }
 
 model Order {
-  id         Int         @id @default(autoincrement())
-  userId     Int
-  user       User        @relation(fields: [userId], references: [id])
-  total      Float
-  status     String      @default("PENDING") // PENDING, COMPLETED, CANCELED
-  createdAt  DateTime    @default(now())
-  items      OrderItem[]
+  id          Int         @id @default(autoincrement())
+  userId      Int
+  user        User        @relation(fields: [userId], references: [id])
+  client      String?      // Nombre/Mesa del cliente para la venta
+  total       Float       @default(0)
+  status      String      @default("PENDING") // PENDING, COMPLETED, CANCELED   
+  paymentMethod String?     // Efectivo, Tarjeta, etc.
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  items       OrderItem[]
 }
 
 model OrderItem {
-  id        Int     @id @default(autoincrement())
-  orderId   Int
-  order     Order   @relation(fields: [orderId], references: [id])
-  productId Int
-  product   Product @relation(fields: [productId], references: [id])
+  id          Int      @id @default(autoincrement())
+  orderId     Int
+  order       Order    @relation(fields: [orderId], references: [id])
+  productId   Int?
+  product     Product?  @relation(fields: [productId], references: [id])
   
-  cantidad  Int
-  precio    Float   // guardamos el precio histórico del producto en el momento del pedido
+  // SNAPSHOTS (Datos históricos congelados)
+  nombre      String   // Guardamos el nombre tal como era al venderse
+  cantidad    Int
+  precio      Float    // Precio unitario al momento de la venta
 }
 
 model Gastos {
@@ -72,4 +78,9 @@ model TipoGasto {
   gastos    Gastos?   @relation(fields: [gastosId], references: [id])
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
+}
+
+model PaymentMethod {
+  id          Int         @id @default(autoincrement())
+  nombre      String      @unique
 }

@@ -1,151 +1,336 @@
-import { PrismaClient } from '@prisma/client'
-const prisma = new PrismaClient()
+import {prisma} from '../lib/prisma.js'
 
+/**
+ * Crea una nueva orden.
+ * Puede iniciar vacía o con productos ya seleccionados.
+ */
 export const createOrder = async (req, res) => {
+  const { userId, items } = req.body; // items es un array: [{ productId, quantity }]
+
   try {
-    const userId = req.user.id // Viene del middleware verifyToken
-    const { items } = req.body // Esperamos: [{ productId: 1, cantidad: 2 }, ...]
+    // Usamos una transacción interactiva para asegurar integridad
+    const result = await prisma.$transaction(async (tx) => {
+      let totalOrder = 0;
+      const orderItemsData = [];
 
-    if (!items || items.length === 0) {
-      return res.status(400).json({ error: 'El carrito no puede estar vacío' })
-    }
+      // 1. Si hay items, validamos stock (opcional) y obtenemos precios actuales
+      if (items && items.length > 0) {
+        for (const item of items) {
+          const product = await tx.product.findUnique({
+            where: { id: item.productId }
+          });
 
-    // 1. Calcular total y preparar datos verificando precios ACTUALES
-    let totalOrder = 0
-    const orderItemsData = []
+          if (!product || !product.isActive) {
+            throw new Error(`El producto con ID ${item.productId} no existe o no está activo.`);
+          }
 
-    for (const item of items) {
-      const product = await prisma.product.findUnique({ where: { id: item.productId } })
-      
-      if (!product) {
-        return res.status(404).json({ error: `Producto ID ${item.productId} no encontrado` })
+          const subtotal = product.precio * item.quantity;
+          totalOrder += subtotal;
+
+          // Preparamos el objeto para crear el OrderItem con SNAPSHOTS
+          orderItemsData.push({
+            productId: product.id,
+            cantidad: item.quantity,
+            precio: product.precio, // Snapshot del precio
+            nombre: product.nombre  // Snapshot del nombre
+          });
+        }
       }
 
-      // ⚠️ AQUÍ ESTÁ LA MAGIA:
-      // Usamos 'product.precio' (precio actual de la BD) para guardarlo en la orden.
-      // Ignoramos cualquier precio que envíe el usuario desde el frontend.
-      const snapshotPrice = product.precio
-      const subtotal = snapshotPrice * item.cantidad
-      
-      totalOrder += subtotal
+      // 2. Crear la orden con sus items (si existen)
+      const newOrder = await tx.order.create({
+        data: {
+          userId,
+          status: 'PENDING', // O "EN_CURSO"
+          total: totalOrder,
+          items: {
+            create: orderItemsData
+          }
+        },
+        include: {
+          items: true // Retornamos los items creados al front
+        }
+      });
 
-      orderItemsData.push({
-        productId: product.id,
-        cantidad: item.cantidad,
-        precio: snapshotPrice // Guardamos el precio histórico
-      })
+      return newOrder;
+    });
+
+    return res.status(201).json(result);
+
+  } catch (error) {
+    console.error("Error creating order:", error);
+    return res.status(500).json({ error: error.message || 'Error al crear la orden' });
+  }
+};
+
+/**
+ * Obtiene órdenes con filtros avanzados.
+ * Maneja el desvío horario UTC-3 (Argentina)
+ */
+export const getOrders = async (req, res) => {
+  const { startDate, endDate, status } = req.query;
+
+  try {
+    const whereClause = {};
+
+    // 1. Filtro por Estado
+    if (status) {
+      whereClause.status = status;
     }
 
-    // 2. Crear la orden y sus items en una transacción
-    const newOrder = await prisma.order.create({
-      data: {
-        userId,
-        total: totalOrder,
-        items: {
-          create: orderItemsData 
+    // 2. Filtro por Rango de Fechas (Ajustado a UTC-3)
+    if (startDate) {
+      // Si no hay endDate, usamos la misma fecha de inicio para filtrar un solo día
+      const finalEndDate = endDate || startDate;
+
+      whereClause.createdAt = {
+        // gte: mayor o igual que las 00:00:00 de Argentina
+        gte: new Date(`${startDate}T00:00:00-03:00`),
+        // lte: menor o igual que las 23:59:59 de Argentina
+        lte: new Date(`${finalEndDate}T23:59:59-03:00`)
+      };
+    }
+
+    const orders = await prisma.order.findMany({
+      where: whereClause,
+      include: {
+        items: true,
+        user: { 
+          select: { id: true, nombre: true } 
         }
       },
-      include: { items: true } // Devolver la orden con sus items
-    })
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
 
-    res.status(201).json(newOrder)
+    return res.json(orders);
 
   } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: 'Error al crear la orden' })
+    console.error("Error en getOrders:", error);
+    return res.status(500).json({ error: 'Error al obtener las órdenes' });
   }
-}
+};
 
-// Obtener órdenes (Admin ve todas, Usuario ve las suyas)
-export const getOrders = async (req, res) => {
-    const whereClause = req.user.isAdmin ? {} : { userId: req.user.id }
+
+/**
+ * Actualiza el estado de la orden (e.g., de PENDING a COMPLETED o CANCELED)
+ */
+export const updateOrderStatus = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body; // 'COMPLETED', 'CANCELED'
+
+  try {
+    const order = await prisma.order.update({
+      where: { id: Number(id) },
+      data: { status },
+    });
+
+    return res.json(order);
+  } catch (error) {
+    return res.status(500).json({ error: 'Error actualizando estado' });
+  }
+};
+
+/**
+ * Actualiza el estado de la orden (e.g., de PENDING a COMPLETED o CANCELED)
+ */
+export const updateOrder = async (req, res) => {
+  const { id } = req.params;
+
+  const data = {};
+
+  if (req.body.status !== undefined) {
+    data.status = req.body.status; // 'PENDING', 'COMPLETED', 'CANCELED'
+  }
+
+  if (req.body.client !== undefined) {
+    data.client = req.body.client; //nombre del cliente o mesa
+  }
+
+  if (req.body.paymentMethod !== undefined) {
+    data.paymentMethod = req.body.paymentMethod; // 'CASH', 'CARD', etc. en string para mayor flexibilidad historica
+  }
     
-    const orders = await prisma.order.findMany({
-        where: whereClause,
-        include: { items: { include: { product: true } } }
-    })
-    res.json(orders)
-}
+   
 
-// Cancelar una orden
-export const cancelOrder = async (req, res) => {
   try {
-    const orderId = Number(req.params.id)
-    const userId = req.user.id
-    const isAdmin = req.user.isAdmin
+    const order = await prisma.order.update({
+      where: { id: Number(id) },
+      data: data,
+    });
 
-    // 1. Buscar la orden
-    const order = await prisma.order.findUnique({
-      where: { id: orderId }
-    })
+    return res.json(order);
+  } catch (error) {
+    return res.status(500).json({ error: 'Error actualizando' });
+  }
+};
 
-    if (!order) return res.status(404).json({ error: 'Orden no encontrada' })
+/**
+ * Reporte de Ingresos (Analytics)
+ * Calcula el total vendido en un rango de tiempo ajustado a UTC-3
+ */
+export const getRevenueStats = async (req, res) => {
+  const { startDate, endDate } = req.query;
 
-    // 2. Seguridad: ¿Es el dueño de la orden o es admin?
-    if (order.userId !== userId && !isAdmin) {
-      return res.status(403).json({ error: 'No tienes permiso para cancelar esta orden' })
+  try {
+    if (!startDate) {
+      return res.status(400).json({ error: 'Se requiere al menos startDate' });
     }
 
-    // 3. Opcional: Validar que no esté ya completada
-    if (order.status === 'COMPLETED') {
-      return res.status(400).json({ error: 'No se puede cancelar una orden que ya fue completada' })
-    }
+    // Usamos la misma lógica de "blindaje" horario
+    const finalEndDate = endDate || startDate;
+    const start = new Date(`${startDate}T00:00:00-03:00`);
+    const end = new Date(`${finalEndDate}T23:59:59-03:00`);
 
-    // 4. Actualizar el estado a "CANCELED"
-    const updatedOrder = await prisma.order.update({
-      where: { id: orderId },
-      data: { status: 'CANCELED' }
-    })
+    // Prisma Aggregate para sumar de forma eficiente en la DB
+    const aggregations = await prisma.order.aggregate({
+      _sum: {
+        total: true,
+      },
+      _count: {
+        id: true
+      },
+      where: {
+        createdAt: {
+          gte: start,
+          lte: end,
+        },
+        status: 'COMPLETED' // Solo sumamos lo que ya fue cobrado
+      },
+    });
 
-    res.json({ message: 'Orden cancelada con éxito', order: updatedOrder })
+    return res.json({
+      range: { startDate, endDate: finalEndDate },
+      totalRevenue: aggregations._sum.total || 0,
+      totalOrders: aggregations._count.id || 0
+    });
+
   } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: 'Error al cancelar la orden' })
+    console.error("Error en getRevenueStats:", error);
+    return res.status(500).json({ error: 'Error calculando ingresos' });
   }
-}
+};
 
-//  Completar orden, PATCH /api/orders/:id/complete
-export const completeOrder = async (req, res) => {
+export const updateOrderItems = async (req, res) => {
+  const { id } = req.params; // ID de la Orden
+  const { productId, action } = req.body; // action: 'ADD', 'REMOVE', 'DELETE'
+
   try {
-    const orderId = Number(req.params.id)
+    const result = await prisma.$transaction(async (tx) => {
+      // 1. Buscar la orden y el producto
+      const order = await tx.order.findUnique({ 
+        where: { id: Number(id) }, 
+        include: { items: true } 
+      });
+      
+      if (!order || order.status !== 'PENDING') {
+        throw new Error("La orden no existe o ya está cerrada.");
+      }
 
-    // 1. Verificación de seguridad: Solo el admin puede completar
-    if (!req.user.isAdmin) {
-      return res.status(403).json({ error: 'Solo un administrador puede marcar órdenes como completadas' })
-    }
+      const product = await tx.product.findUnique({ where: { id: productId } });
+      if (!product) throw new Error("Producto no encontrado.");
 
-    const order = await prisma.order.findUnique({ where: { id: orderId } })
-    if (!order) return res.status(404).json({ error: 'Orden no encontrada' })
+      // 2. Buscar si el item ya está en la orden
+      const existingItem = order.items.find(item => item.productId === productId);
 
-    // 2. Cambiar estado a COMPLETED
-    const updatedOrder = await prisma.order.update({
-      where: { id: orderId },
-      data: { status: 'COMPLETED' }
-    })
+      if (action === 'ADD') {
+        if (existingItem) {
+          await tx.orderItem.update({
+            where: { id: existingItem.id },
+            data: { cantidad: { increment: 1 } }
+          });
+        } else {
+          await tx.orderItem.create({
+            data: {
+              orderId: order.id,
+              productId: product.id,
+              nombre: product.nombre,
+              precio: product.precio,
+              cantidad: 1
+            }
+          });
+        }
+      } 
+      
+      else if (action === 'REMOVE' && existingItem) {
+        if (existingItem.cantidad > 1) {
+          await tx.orderItem.update({
+            where: { id: existingItem.id },
+            data: { cantidad: { decrement: 1 } }
+          });
+        } else {
+          await tx.orderItem.delete({ where: { id: existingItem.id } });
+        }
+      }
 
-    res.json({ message: 'Orden marcada como completada', order: updatedOrder })
+      else if (action === 'DELETE' && existingItem) {
+        await tx.orderItem.delete({ where: { id: existingItem.id } });
+      }
+
+      // 3. Recalcular el TOTAL de la orden
+      const updatedItems = await tx.orderItem.findMany({ where: { orderId: order.id } });
+      const newTotal = updatedItems.reduce((acc, item) => acc + (item.precio * item.cantidad), 0);
+
+      return await tx.order.update({
+        where: { id: order.id },
+        data: { total: newTotal },
+        include: { items: true }
+      });
+    });
+
+    res.json(result);
   } catch (error) {
-    res.status(500).json({ error: 'Error al actualizar la orden' })
+    res.status(500).json({ error: error.message });
   }
-}
+};
 
-// GET Obtener estadísticas de órdenes (solo Admin)
-export const getStats = async (req, res) => {
+
+// ==========================================
+// PAYMENT METHODS
+// ==========================================
+
+export const getPaymentMethods = async (req, res) => {
   try {
-    // Solo el Admin puede ver la "caja"
-    if (!req.user.isAdmin) return res.status(403).json({ error: 'No autorizado' })
-
-    const stats = await prisma.order.aggregate({
-      where: { status: 'COMPLETED' }, // Solo sumamos lo que ya se pagó/entregó
-      _sum: { total: true },
-      _count: { id: true }
-    })
-
-    res.json({
-      ingresosTotales: stats._sum.total || 0,
-      pedidosFinalizados: stats._count.id || 0
-    })
+    const methods = await prisma.paymentMethod.findMany({
+      orderBy: { nombre: 'asc' }
+    });
+    res.json(methods);
   } catch (error) {
-    res.status(500).json({ error: 'Error al calcular estadísticas' })
+    res.status(500).json({ error: 'Error obteniendo métodos' });
   }
-}
+};
+
+export const createPaymentMethod = async (req, res) => {
+  try {
+    const method = await prisma.paymentMethod.create({
+      data: { nombre: req.body.nombre }
+    });
+    res.json(method);
+  } catch (error) {
+    res.status(500).json({ error: 'Error creando método' });
+  }
+};
+
+export const updatePaymentMethod = async (req, res) => {
+  try {
+    const method = await prisma.paymentMethod.update({
+      where: { id: Number(req.params.id) },
+      data: { nombre: req.body.nombre }
+    });
+    res.json(method);
+  } catch (error) {
+    res.status(500).json({ error: 'Error actualizando método' });
+  }
+};
+
+export const deletePaymentMethod = async (req, res) => {
+  try {
+    await prisma.paymentMethod.delete({
+      where: { id: Number(req.params.id) }
+    });
+    res.json({ message: 'Eliminado' });
+  } catch (error) {
+    res.status(500).json({ error: 'Error eliminando método' });
+  }
+};

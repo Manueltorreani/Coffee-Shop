@@ -83,7 +83,7 @@ export const deleteUser = async (id) => {
 }
 
 /* =========================
-   LOGOUT
+   LOGOUT // remplazado por logout en AuthContext, ya no uso este método, pero lo dejo por si acaso
 ========================= */
 export const logout = () => {
   localStorage.removeItem('token')

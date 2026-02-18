@@ -1,31 +1,58 @@
 
 import { Router } from 'express'
-// Asegurate de que este archivo (el controlador) tambien exista:
-import { createOrder, getOrders, cancelOrder, completeOrder, getStats } from '../controllers/orders.controller.js'
-// Asegurate de que este archivo (auth utils) tambien exista:
+import { 
+  createOrder, 
+  getOrders, 
+  getRevenueStats, 
+  updateOrder, 
+  updateOrderItems,
+  getPaymentMethods,
+  createPaymentMethod,
+  updatePaymentMethod,
+  deletePaymentMethod
+} from '../controllers/orders.controller.js';
 import { verifyToken, verifyAdmin } from '../utils/auth.js'
 
 const router = Router()
 
-// Todas las rutas de órdenes requieren estar logueado (JWT)
-router.use(verifyToken)
+// ==========================================
+// ORDERS - Geters y Estadísticas
+// ==========================================
 
-// POST /api/orders -> Crear pedido
-router.post('/', createOrder)
+// Obtener todas las órdenes (con filtros de fecha y estado)
+// GET /api/orders?startDate=...&status=...
+router.get('/', verifyToken, getOrders);
 
-// GET /api/orders -> Ver pedidos
-router.get('/', getOrders)
+// Obtener estadísticas de ingresos
+// GET /api/orders/stats?startDate=...
+router.get('/stats', verifyToken, verifyAdmin, getRevenueStats); 
 
-// PATCH /api/orders/:id/cancel -> Cancelar pedido (puede cancelar usuario o admin)
-router.patch('/:id/cancel', cancelOrder)
 
-// Rutas SOLO de Admin
-// Usamos verifyAdmin como middleware extra aquí
+// ==========================================
+// PAYMENT METHODS
+// ==========================================
 
-// PATCH /api/orders/:id/complete -> Completar pedido
-router.patch('/:id/complete', verifyAdmin, completeOrder)
+router.get('/payment-methods', verifyToken, getPaymentMethods);
 
-// GET /api/orders/stats -> Ver estadísticas de órdenes (solo Admin)
-router.get('/stats', verifyAdmin, getStats)
+router.post('/payment-methods', verifyToken, verifyAdmin, createPaymentMethod);
 
-export default router
+router.put('/payment-methods/:id', verifyToken, verifyAdmin, updatePaymentMethod);
+
+router.delete('/payment-methods/:id', verifyToken, verifyAdmin, deletePaymentMethod);
+
+// ==========================================
+// ÓRDENES - Creación y Actualización ADMIN
+// ==========================================
+
+// Crear una nueva orden (Apertura de caja / Nueva venta)
+// POST /api/orders
+router.post('/', verifyToken, verifyAdmin, createOrder);
+
+// Actualizar estado (Ej: PENDING -> COMPLETED o CANCELED)
+// PATCH /api/orders/:id/status
+router.patch('/:id/status', verifyToken, verifyAdmin, updateOrder);
+
+// Actualizar items de una orden (Agregar/Quitar cantidad)
+router.put('/:id/items', verifyToken, verifyAdmin, updateOrderItems);
+
+export default router;
