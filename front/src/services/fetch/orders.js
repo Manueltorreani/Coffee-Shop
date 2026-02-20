@@ -43,17 +43,14 @@ export const updateOrderStatus = async (orderId, data) => {
   });
 };
 
-/**
- * Obtiene estadísticas de ingresos para un periodo
- * @param {string} startDate - Formato YYYY-MM-DD
- * @param {string} endDate - Formato YYYY-MM-DD
- */
-export const getRevenueStats = async (startDate, endDate) => {
+export const getRevenueSummary = async (startDate, endDate) => {
   const params = new URLSearchParams({ startDate, endDate });
-  
-  return await apiFetch(`/orders/stats?${params.toString()}`, {
-    method: 'GET',
-  });
+  return await apiFetch(`/orders/stats/summary?${params.toString()}`);
+};
+
+export const getDailyRevenue = async (startDate, endDate) => {
+  const params = new URLSearchParams({ startDate, endDate });
+  return await apiFetch(`/orders/stats/daily?${params.toString()}`);
 };
 
 export const updateOrderItems = async (orderId, productId, action) => {

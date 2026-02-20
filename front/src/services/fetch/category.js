@@ -5,7 +5,7 @@ import { apiFetch } from "../api";
  * @param {Object} categoryData - { nombre }
  */
 export const createCategory = async (categoryData) => {
-  return await apiFetch('/categories', {
+  return await apiFetch('/products/cat', {
     method: 'POST',
     body: JSON.stringify(categoryData),
   });
@@ -16,10 +16,10 @@ export const createCategory = async (categoryData) => {
  * @param {number} categoryId 
  * @param {string} nombre
  */
-export const updateCategoryStatus = async (categoryId, nombre) => {
-  return await apiFetch(`/products/cat/${categoryId}`, {
+export const updateCategory = async (id, categoryData) => {
+  return await apiFetch(`/products/cat/${id}`, {
     method: 'PUT',
-    body: JSON.stringify({ nombre }),
+    body: JSON.stringify(categoryData),
   });
 };
 

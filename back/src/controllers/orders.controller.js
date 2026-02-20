@@ -212,6 +212,55 @@ export const getRevenueStats = async (req, res) => {
   }
 };
 
+export const getDailyRevenue = async (req, res) => {
+  const { startDate, endDate } = req.query;
+
+  try {
+    if (!startDate || !endDate) {
+      return res.status(400).json({ error: 'Se requieren startDate y endDate' });
+    }
+
+    const start = new Date(`${startDate}T00:00:00-03:00`);
+    const end = new Date(`${endDate}T23:59:59-03:00`);
+
+    // Obtenemos todas las órdenes completadas en el rango
+    const orders = await prisma.order.findMany({
+      where: {
+        createdAt: { gte: start, lte: end },
+        status: 'COMPLETED'
+      },
+      select: {
+        total: true,
+        createdAt: true
+      },
+      orderBy: { createdAt: 'asc' }
+    });
+
+    // Agrupamos por día en JS (formato YYYY-MM-DD)
+    const dailyData = orders.reduce((acc, order) => {
+      // Ajustamos la fecha de la orden a la zona horaria UTC-3 para el agrupamiento
+      const day = new Date(order.createdAt).toLocaleDateString('en-CA', { 
+        timeZone: 'America/Argentina/Buenos_Aires' 
+      });
+      
+      if (!acc[day]) {
+        acc[day] = { date: day, total: 0, orders: 0 };
+      }
+      acc[day].total += order.total;
+      acc[day].orders += 1;
+      return acc;
+    }, {});
+
+    // Convertimos el objeto en un array ordenado para el gráfico
+    const chartData = Object.values(dailyData);
+
+    return res.json(chartData);
+  } catch (error) {
+    console.error("Error en getDailyRevenue:", error);
+    return res.status(500).json({ error: 'Error calculando evolución diaria' });
+  }
+};
+
 export const updateOrderItems = async (req, res) => {
   const { id } = req.params; // ID de la Orden
   const { productId, action } = req.body; // action: 'ADD', 'REMOVE', 'DELETE'

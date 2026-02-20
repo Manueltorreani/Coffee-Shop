@@ -8,6 +8,8 @@ import VentasPage from './pages/VentasPage.jsx'
 import CajaPage from './pages/CajaPage.jsx'
 import GastosPage from './pages/GastosPage.jsx'
 import ConfigPage from './pages/ConfigPage.jsx'
+import CategoriasPage from './pages/CategoriasPage.jsx'
+import DashboardPage from './pages/DashboardPage.jsx'
 
 import { useAuth } from './context/AuthContext.jsx'
 
@@ -29,9 +31,8 @@ function AdminRoute({ children }) {
 
   if (loading) return <div>Cargando permisos...</div> // ¡Crucial!
 
-  /*if (!user || !user.isAdmin) {*/
-  if (!user) {
-    return <Navigate to="/" replace />
+  if (!user.isAdmin) {
+    return <Navigate to="/ventas" replace />
   }
 
   return children
@@ -54,47 +55,52 @@ export default function Router() {
         }
       >
         {/* INDEX → CARTA (todos) */}
-        <Route index element={<CartaPage />} />
+        <Route index element={<AdminRoute><DashboardPage /></AdminRoute>} />
+        <Route
+          path="/ventas"
+          element={<VentasPage />}
+        />
 
         {/* ADMIN */}
         <Route
           path="/products"
           element={
-            <ProtectedRoute>
+            <AdminRoute>
               <ProductsPage />
-            </ProtectedRoute>
+            </AdminRoute>
           }
         />
         <Route
-          path="/ventas"
+          path="/categorias"
           element={
-            <ProtectedRoute>
-              <VentasPage />
-            </ProtectedRoute>
+            <AdminRoute>
+              <CategoriasPage />
+            </AdminRoute>
           }
         />
+        
         <Route
           path="/caja"
           element={
-            <ProtectedRoute>
+            <AdminRoute>
               <CajaPage />
-            </ProtectedRoute>
+            </AdminRoute>
           }
         />
         <Route
           path="/gastos"
           element={
-            <ProtectedRoute>
+            <AdminRoute>
               <GastosPage />
-            </ProtectedRoute>
+            </AdminRoute>
           }
         />
         <Route
           path="/config"
           element={
-            <ProtectedRoute>
+            <AdminRoute>
               <ConfigPage />
-            </ProtectedRoute>
+            </AdminRoute>
           }
         />
       </Route>

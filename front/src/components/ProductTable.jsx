@@ -24,36 +24,38 @@ export default function ProductTable({items, onEdit, onDelete}){
                 ))}
              </tbody>   
         </table>*/
-         <table border="1" cellPadding="8" style={{ width: "100%", borderCollapse: "collapse" }}>
-      <thead>
-        <tr style={{ background: "#eee" }}>
-          <th>ID</th>
-          <th>Nombre</th>
-          <th>Categoria</th>
-          <th>Precio</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        {items.length === 0 ? (
-          <tr>
-            <td colSpan="4" style={{ textAlign: "center" }}>No hay productos</td>
+      <div className="bg-white shadow rounded-lg overflow-hidden flex flex-col justify-center items-center">
+        <table className="w-full text-left py-2 px-4 justify-center"  border="1"  style={{ width: "100%", borderCollapse: "collapse" }}>
+        <thead className="h-12">
+          <tr style={{ background: "#eee" }}>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Categoria</th>
+            <th>Precio</th>
+            <th>Acciones</th>
           </tr>
-        ) : (
-          items.map((p) => (
-            <tr key={p.id}>
-              <td>{p.id}</td>
-              <td>{p.nombre}</td>
-              <td>{p.category.nombre}</td>
-              <td>${p.precio}</td>
-              <td>
-                <button onClick={() => onEdit(p)}>✏️ Editar</button>
-                <button onClick={() => onDelete(p.id)}>🗑️ Borrar</button>
-              </td>
+        </thead>
+        <tbody>
+          {items.length === 0 ? (
+            <tr>
+              <td colSpan="4" style={{ textAlign: "center" }}>No hay productos</td>
             </tr>
-          ))
-        )}
-      </tbody>
-    </table>
+          ) : (
+            items.map((p) => (
+              <tr key={p.id}>
+                <td>{p.id}</td>
+                <td>{p.nombre}</td>
+                <td>{p.category.nombre}</td>
+                <td>${p.precio}</td>
+                <td>
+                  <button onClick={() => onEdit(p)}><span className="text-blue-600 hover:underline">✏️ Editar</span></button>
+                  <button onClick={() => onDelete(p.id)}><span className="text-red-600 hover:underline">🗑️ Borrar</span></button>
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+    </div>
     )
 }

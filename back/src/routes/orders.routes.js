@@ -3,7 +3,8 @@ import { Router } from 'express'
 import { 
   createOrder, 
   getOrders, 
-  getRevenueStats, 
+  getRevenueStats,
+  getDailyRevenue,
   updateOrder, 
   updateOrderItems,
   getPaymentMethods,
@@ -25,7 +26,8 @@ router.get('/', verifyToken, getOrders);
 
 // Obtener estadísticas de ingresos
 // GET /api/orders/stats?startDate=...
-router.get('/stats', verifyToken, verifyAdmin, getRevenueStats); 
+router.get('/stats/summary', verifyToken, verifyAdmin, getRevenueStats);
+router.get('/stats/daily', verifyToken, verifyAdmin, getDailyRevenue);
 
 
 // ==========================================

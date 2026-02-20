@@ -23,7 +23,7 @@ export default function VentasPage() {
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [filterDate, setFilterDate] = useState(getTodayInUTC3()); // Inicializamos con la fecha actual en UTC-3
+  const [filterDate, setFilterDate] = useState(); // Inicializamos con la fecha actual en UTC-3
 
   // Catálogo completo para búsqueda instantánea
   const [allProducts, setAllProducts] = useState([]);
@@ -161,10 +161,40 @@ export default function VentasPage() {
             </button>
           </div>
           <div>
-            <div className="relative">
-              <Calendar className="absolute left-3 top-2.5 text-gray-400" size={18} />
-              <input type="date" value={filterDate} onChange={(e) => setFilterDate(e.target.value)} className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none font-medium text-gray-700"/>
+            <div className="flex flex-row items-center gap-3 bg-white p-2 rounded-xl border border-gray-200 shadow-sm">
+            {/* Botón Hoy */}
+            <button 
+              className='px-3 py-2 text-sm font-semibold rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors' 
+              onClick={() => setFilterDate(getTodayInUTC3())}
+            >
+              Hoy
+            </button>
+
+            {/* Contenedor del Input con Icono */}
+            <div className="relative flex items-center">
+              <Calendar 
+                className="absolute left-3 text-gray-400 pointer-events-none" 
+                size={18} 
+              />
+              <input 
+                type="date" 
+                value={filterDate || ""} // Evita el error de "uncontrolled component"
+                onChange={(e) => setFilterDate(e.target.value)} 
+                className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none font-medium text-gray-700 text-sm"
+              />
             </div>
+
+            {/* Botón Limpiar (X) */}
+            {filterDate && (
+              <button 
+                onClick={() => setFilterDate("")} // Mejor usar string vacío que undefined para el input
+                className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"
+                title="Limpiar filtro"
+              >
+                <X size={18} />
+              </button>
+            )}
+          </div>
           </div>
         </div>
 

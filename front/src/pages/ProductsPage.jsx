@@ -81,9 +81,9 @@ export default function ProductsPage(){
 
      return (
     <div className="w-full gap-5 flex flex-col" style={{margin: '40px auto', padding: '0 12px'}}>
-      <h1>Productos</h1>
+      <h1 className="text-2xl font-bold">Productos</h1>
       {editing ? (
-      <>
+      <div className="p-4 rounded bg-blue-50">
         <h2>{editing.id ? 'Editando producto: ' + editing.nombre : 'Creando nuevo producto'}</h2>
         <ProductForm
           initialData={editing}
@@ -97,8 +97,8 @@ export default function ProductsPage(){
             load() // recargar lista
           }}
           onCancel={() => setEditing(null)}
-      />
-      </>
+        />
+      </div>
       ) : (
       <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={() => setEditing({})}>➕ Nuevo producto</button>
     )}
@@ -142,7 +142,6 @@ export default function ProductsPage(){
           </p>
         </>
       )}
-      <button onClick={loadCategories}>Cargar categorias</button>
     </div>
   )
 

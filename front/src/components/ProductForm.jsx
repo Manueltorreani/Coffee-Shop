@@ -53,7 +53,7 @@ export default function ProductForm ({initialData, onSave, onCancel}){
 
     return(
       <div className="flex w-full min-w-[400px] justify-center">
-        <form onSubmit={handleSubmit} className=" min-w-[400px] border p-4 rounded flex flex-col gap-4 items-start">
+        <form onSubmit={handleSubmit} className=" min-w-[400px] border p-4 rounded flex flex-col gap-4 items-start bg-white">
         <label className="flex flex-row justify-between w-full">
           Nombre:
           <input

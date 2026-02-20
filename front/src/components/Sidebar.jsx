@@ -24,16 +24,7 @@ import { useAuth } from '../context/AuthContext.jsx'
       </NavLink>
 
       <nav className="flex flex-col gap-6 mt-5" >
-
-          <NavLink to="/products" end
-            className={({ isActive }) =>
-              `${isActive 
-                  ? 'bg-[var(--blue-50)] text-[var(--blue-700)] border-2 border-[var(--blue-500)]' 
-                  : 'bg-transparent hover:text-blue-500 hover:border-2 hover:border-[var(--blue-300)]'
-              } text-start m-0 py-3 pl-5 pr-1 rounded-lg`
-            }
-          >Productos</NavLink>
-
+          
           <NavLink to="/ventas"
             className={({ isActive }) =>
               `${isActive 
@@ -43,6 +34,28 @@ import { useAuth } from '../context/AuthContext.jsx'
             }
           >Ventas</NavLink>
 
+          {user.isAdmin && (
+          <NavLink to="/products" end
+            className={({ isActive }) =>
+              `${isActive 
+                  ? 'bg-[var(--blue-50)] text-[var(--blue-700)] border-2 border-[var(--blue-500)]' 
+                  : 'bg-transparent hover:text-blue-500 hover:border-2 hover:border-[var(--blue-300)]'
+              } text-start m-0 py-3 pl-5 pr-1 rounded-lg`
+            }
+          >Productos</NavLink>)}
+
+          {user.isAdmin && (
+          <NavLink to="/categorias"
+            className={({ isActive }) =>
+              `${isActive 
+                  ? 'bg-[var(--blue-50)] text-[var(--blue-700)] border-2 border-[var(--blue-500)]' 
+                  : 'bg-transparent hover:text-blue-500 hover:border-2 hover:border-[var(--blue-300)]'
+              } text-start m-0 py-3 pl-5 pr-1 rounded-lg`
+            }
+          >Categorías</NavLink>)}
+
+          
+          {user.isAdmin && (
           <NavLink to="/caja"
             className={({ isActive }) =>
               `${isActive 
@@ -50,17 +63,19 @@ import { useAuth } from '../context/AuthContext.jsx'
                   : 'bg-transparent hover:text-blue-500 hover:border-2 hover:border-[var(--blue-300)]'
               } text-start m-0 py-3 pl-5 pr-1 rounded-lg`
             }
-        >Movimientos de caja</NavLink>
+        >Movimientos de caja</NavLink>)}
 
-          <NavLink to="/gastos"
-            className={({ isActive }) =>
-              `${isActive 
-                  ? 'bg-[var(--blue-50)] text-[var(--blue-700)] border-2 border-[var(--blue-500)]' 
-                  : 'bg-transparent hover:text-blue-500 hover:border-2 hover:border-[var(--blue-300)]'
-              } text-start justify-center m-0 py-3 pl-5  rounded-lg`
-            }
-          >Gastos</NavLink>
+        {user.isAdmin && (
+        <NavLink to="/gastos"
+          className={({ isActive }) =>
+            `${isActive 
+                ? 'bg-[var(--blue-50)] text-[var(--blue-700)] border-2 border-[var(--blue-500)]' 
+                : 'bg-transparent hover:text-blue-500 hover:border-2 hover:border-[var(--blue-300)]'
+            } text-start justify-center m-0 py-3 pl-5  rounded-lg`
+          }
+        >Gastos</NavLink>)}
 
+        {user.isAdmin && (
         <NavLink to="/config"
           className={({ isActive }) =>
               `${isActive 
@@ -70,7 +85,7 @@ import { useAuth } from '../context/AuthContext.jsx'
             }
         >
           Configuración
-        </NavLink>
+        </NavLink>)}
 
       </nav>
     </div>
