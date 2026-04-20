@@ -133,6 +133,10 @@ export default function LoginPage(){
             {isRegister ? 'Iniciá sesión' : 'Registrate'}
           </button>
         </div>
+        <div className="flex flex-col text-gray-500">
+            <p>usuario : pedro@gmail.com </p>
+            <p>password : Pedro123</p>
+        </div>
       </div>
     </div>
   )

@@ -11,7 +11,9 @@ import productsRouter from './routes/products.routes.js'
 import ordersRouter from './routes/orders.routes.js'
 
 const app = express()
-const PORT = 3001
+const RUTA = process.env.RUTA || "http://localhost"
+const PORT = process.env.PORT || 3001
+const FRONTEND_PORT = process.env.FRONTEND_PORT || 5173
 
 // 2) Cargar definición de Swagger (OpenAPI)
 const swaggerDoc = YAML.load('./swagger.yml')
@@ -24,7 +26,7 @@ app.use(express.json()) // para que lo que yo recibo en el body lo parseo como o
 // 3.b) CORS (una sola configuración nunca es suficiente pero al menos ayuda )
 app.use(
   cors({
-    origin: 'http://localhost:5173', 
+    origin: RUTA + ':'+  FRONTEND_PORT, 
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   })
@@ -64,7 +66,7 @@ app.get('/api/hello', (_req, res) => {
   res.json({ message: 'Hola Manu tu servidor funciona' })
 })
 
-app.get('/api/echo', (req, res) => {
+app.get('/api/echo', (req, res) => { 
   res.json({
     message: 'Echo',
     origin: req.headers.origin || null,
@@ -96,5 +98,5 @@ app.use((err, _req, res, _next) => {
 
 // 6) Levantar servidor
 app.listen(PORT, () => {
-  console.log(`Servidor escuchando en http://localhost:${PORT}`)
+  console.log(`Servidor escuchando en ${RUTA}:${PORT}`)
 })
