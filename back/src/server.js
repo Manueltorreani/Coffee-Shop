@@ -9,6 +9,7 @@ import YAML from 'yamljs'
 import authRouter from './routes/auth.routes.js'
 import productsRouter from './routes/products.routes.js'
 import ordersRouter from './routes/orders.routes.js'
+import gastosRouter from './routes/gastos.routes.js'
 
 const app = express()
 const RUTA = process.env.RUTA || "http://localhost"
@@ -60,6 +61,7 @@ app.use(
 app.use('/api/auth', authRouter)       // Login y Register, Update, Delete (protegidas update y delete con JWT)
 app.use('/api/products', productsRouter) // Productos (protegidas las de escritura con JWT)
 app.use('/api/orders', ordersRouter)     // Pedidos (protegidas con JWT)
+app.use('/api/gastos',gastosRouter) // Gastos (protegidas con JWT las CRUD)
 
 // 4.c) Endpoints de ejemplo / utilitarios para testear salud servidor
 app.get('/api/hello', (_req, res) => {
