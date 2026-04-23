@@ -1,76 +1,99 @@
 import { prisma } from "@prisma/client";
 
-export const createTipoGastos = async (req,res) => {
-        try {
-            const {nombre } = req.body
-            if(!nombre ) return res.status(400).json({error:"Nombre requerido"})
-            if (typeof nombre !== "string") return res.status(400).json({error:"el nombre no es una cadena de texto"}) 
+// CREAR TIPO DE GASTO
+export const createTipoGastos = async (req, res) => {
+  try {
+    let { nombre } = req.body;
 
-            const nuevoTipoGasto = await prisma.tipoGastos.create({data:{nombre}})
-            return res.status(201).json(nuevoTipoGasto) //201 :creacion exitosa 
+    if (!nombre) return res.status(400).json({ error: "Nombre requerido" });
 
-        } catch (err) {
-        console.error("error creando tipo de gasto : ",err)
-        res.status(500).json({error:"error interno del servidor"})
-        }
-}
+    if (typeof nombre !== "string") {
+      return res.status(400).json({ error: "el nombre no es una cadena de texto" });
+    }
 
-/*model TipoGasto {
-  id          Int         @id @default(autoincrement())
-  nombre      String
-  gastos    Gastos []
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  estado    Boolean   @default(true)
-}*/
-export const updateTipoGasto = async (req,res) => {
-    try {
-        const{nombre,estado}= req.body
-        const id = Number(req.params.id)
-            if(!nombre ) return res.status(400).json({error:"Nombre requerido"})
-            if(!id ) return res.status(400).json({error:" gasto no encontrado"})
+    const nuevoTipoGasto = await prisma.tipoGastos.create({
+      data: { nombre: nombre.trim() },
+    });
 
-            if (typeof nombre !== "string") return res.status(400).json({error:"el nombre no es una cadena de texto"}) 
-            if (Number.isNaN(id)) return res.status(400).json({error:"el id no es un  valor numerico"})
-            if (typeof estado !== "boolean") return res.status(400).json({error:"estado no asignado"})
-            
-                const gastoTipoActualizado = await prisma.tipoGastos.update({where:{id},data:{nombre,estado}})
-                return res.status(202).json(gastoTipoActualizado)
+    return res.status(201).json(nuevoTipoGasto);
+  } catch (err) {
+    console.error("error creando tipo de gasto : ", err);
+    res.status(500).json({ error: "error interno del servidor" });
+  }
+};
 
+// ACTUALIZAR TIPO DE GASTO
+export const updateTipoGasto = async (req, res) => {
+  try {
+    const { nombre, estado } = req.body;
+    const id = Number(req.params.id);
 
-        } catch (err) {
-        console.error("error actualizando tipo de gasto : ",err)
-        res.status(500).json({error:"error interno del servidor"})
-        }
+    if (Number.isNaN(id)) {
+      return res.status(400).json({ error: "id inválido" });
+    }
 
-}
-export const deleteTipoGasto = async (req,res) => {
-    try {
-        
-        const id = Number(req.params.id)
-            
-            if(!id ) return res.status(400).json({error:" gasto no encontrado"})
-            if (Number.isNaN(id) ) return res.status(400).json({error:"el id no es un  valor numerico"})
-            
-                const gastoTipoEliminado = await prisma.tipoGastos.delete({where:{id}})
-                return res.status(200).json(gastoTipoEliminado)
+    const data = {};
 
+    if (nombre !== undefined) {
+      if (typeof nombre !== "string") {
+        return res.status(400).json({ error: "nombre inválido" });
+      }
+      data.nombre = nombre.trim();
+    }
 
-        } catch (err) {
-        console.error("error eliminando tipo de gasto : ",err)
-        res.status(500).json({error:"error interno del servidor"})
-        }
+    if (estado !== undefined) {
+      if (typeof estado !== "boolean") {
+        return res.status(400).json({ error: "estado inválido" });
+      }
+      data.estado = estado;
+    }
 
-}
-export const getTipoGastos = async (req,res) => {
-    try {
+    const gastoTipoActualizado = await prisma.tipoGastos.update({
+      where: { id },
+      data,
+    });
 
-                const tipoGasto = await prisma.tipoGastos.findMany()
-                return res.status(200).json(tipoGasto)
-        } catch (err) {
-        console.error("error obteniendo tipo de gastos : ",err)
-        res.status(500).json({error:"error interno del servidor"})
-        }
+    return res.status(200).json(gastoTipoActualizado);
+  } catch (err) {
+    if (err.code === "P2025") {
+      return res.status(404).json({ error: "Tipo de gasto no encontrado" });
+    }
+    console.error("error actualizando tipo de gasto : ", err);
+    res.status(500).json({ error: "error interno del servidor" });
+  }
+};
 
-}
+// ELIMINAR GASTO
+export const deleteTipoGasto = async (req, res) => {
+  try {
+    const id = Number(req.params.id);
 
+    if (Number.isNaN(id)) {
+      return res.status(400).json({ error: "id inválido" });
+    }
+
+    const gastoTipoEliminado = await prisma.tipoGastos.delete({
+      where: { id },
+    });
+
+    return res.status(200).json(gastoTipoEliminado);
+  } catch (err) {
+    if (err.code === "P2025") {
+      return res.status(404).json({ error: "Tipo de gasto no encontrado" });
+    }
+    console.error("error eliminando tipo de gasto : ", err);
+    res.status(500).json({ error: "error interno del servidor" });
+  }
+};
+
+// OBTENER TIPOS DE GASTOS
+export const getTipoGastos = async (req, res) => {
+  try {
+    const tipoGastos = await prisma.tipoGastos.findMany();
+
+    return res.status(200).json(tipoGastos);
+  } catch (err) {
+    console.error("error obteniendo tipo de gastos : ", err);
+    res.status(500).json({ error: "error interno del servidor" });
+  }
+};
