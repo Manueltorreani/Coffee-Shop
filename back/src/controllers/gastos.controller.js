@@ -1,4 +1,4 @@
-import { prisma } from "@prisma/client";
+import { prisma } from '../lib/prisma.js'
 
 // CREAR GASTO
 export const createGastos = async (req, res) => {

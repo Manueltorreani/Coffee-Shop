@@ -1,4 +1,4 @@
-import { prisma } from "@prisma/client";
+import { prisma } from '../lib/prisma.js'
 
 // CREAR TIPO DE GASTO
 export const createTipoGastos = async (req, res) => {
@@ -48,7 +48,7 @@ export const updateTipoGasto = async (req, res) => {
       data.estado = estado;
     }
 
-    const gastoTipoActualizado = await prisma.tipoGastos.update({
+    const gastoTipoActualizado = await prisma.tipoGasto.update({
       where: { id },
       data,
     });
@@ -72,7 +72,7 @@ export const deleteTipoGasto = async (req, res) => {
       return res.status(400).json({ error: "id inválido" });
     }
 
-    const gastoTipoEliminado = await prisma.tipoGastos.delete({
+    const gastoTipoEliminado = await prisma.tipoGasto.delete({
       where: { id },
     });
 
@@ -89,7 +89,7 @@ export const deleteTipoGasto = async (req, res) => {
 // OBTENER TIPOS DE GASTOS
 export const getTipoGastos = async (req, res) => {
   try {
-    const tipoGastos = await prisma.tipoGastos.findMany();
+    const tipoGastos = await prisma.tipoGasto.findMany();
 
     return res.status(200).json(tipoGastos);
   } catch (err) {
