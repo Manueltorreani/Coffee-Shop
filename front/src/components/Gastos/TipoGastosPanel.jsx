@@ -5,10 +5,17 @@ export default function TipoGastosPanel (){
    
     const [tipoDeGastos, setTipoDeGastos] = useState([])
     
-    useEffect ( async () =>  {
-        const data = await getTipoGastos()
-        setTipoDeGastos(data)
-        console.log(data)
+    useEffect ( () =>  {
+        const fetchData = async () => {
+          try {
+            const data = await getTipoGastos();
+            setTipoDeGastos(data);
+            console.log(data);
+          } catch (error) {
+            console.error("Error cargando tipos:", error);
+          }
+        };
+        fetchData();
     },[]) 
     return(
         <> 
@@ -31,7 +38,7 @@ export default function TipoGastosPanel (){
               <td className="px-4 py-3 text-gray-400">{row.id}</td>
               <td className="px-4 py-3 font-medium text-gray-800">{row.nombre}</td>
               <td className="px-4 py-3">
-                <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[row.estado]}`}>
+                <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${row.estado ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                   {row.estado}
                 </span>
               </td>
