@@ -1,20 +1,23 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from "react";
 import { getTipoGastos } from "../../services/fetch/gastos";
 
-export default function TipoGastosPanel (){
+  const TipoGastosPanel = forwardRef((props,ref) => {
    
     const [tipoDeGastos, setTipoDeGastos] = useState([])
+
+    const fetchData = async () => {
+      try {
+        const data = await getTipoGastos();
+        setTipoDeGastos(data);
+        console.log(data);
+      } catch (error) {
+        console.error("Error cargando tipos:", error);
+      }
+    };
     
+    useImperativeHandle(ref, () => ({ fetchData }));  // ← exponés fetchData al padre
+
     useEffect ( () =>  {
-        const fetchData = async () => {
-          try {
-            const data = await getTipoGastos();
-            setTipoDeGastos(data);
-            console.log(data);
-          } catch (error) {
-            console.error("Error cargando tipos:", error);
-          }
-        };
         fetchData();
     },[]) 
     return(
@@ -39,7 +42,7 @@ export default function TipoGastosPanel (){
               <td className="px-4 py-3 font-medium text-gray-800">{row.nombre}</td>
               <td className="px-4 py-3">
                 <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${row.estado ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                  {row.estado}
+                  {row.estado ?"activo":"inactivo"}
                 </span>
               </td>
             </tr>
@@ -52,4 +55,5 @@ export default function TipoGastosPanel (){
 
     )
 
-}
+});
+export default TipoGastosPanel; 

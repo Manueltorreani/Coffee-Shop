@@ -3,7 +3,7 @@ import { prisma } from '../lib/prisma.js'
 // CREAR TIPO DE GASTO
 export const createTipoGastos = async (req, res) => {
   try {
-    let { nombre } = req.body;
+    let { nombre, estado } = req.body;
 
     if (!nombre) return res.status(400).json({ error: "Nombre requerido" });
 
@@ -11,8 +11,11 @@ export const createTipoGastos = async (req, res) => {
       return res.status(400).json({ error: "el nombre no es una cadena de texto" });
     }
 
-    const nuevoTipoGasto = await prisma.tipoGastos.create({
-      data: { nombre: nombre.trim() },
+    const nuevoTipoGasto = await prisma.tipoGasto.create({
+      data: { 
+        nombre: nombre.trim(),
+       estado: typeof estado ==="boolean" ? estado:true
+      },
     });
 
     return res.status(201).json(nuevoTipoGasto);
