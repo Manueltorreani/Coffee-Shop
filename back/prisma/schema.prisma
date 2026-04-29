@@ -73,7 +73,7 @@ model Gastos {
 
 model TipoGasto {
   id          Int         @id @default(autoincrement())
-  nombre      String
+  nombre      String      @unique
   gastos    Gastos []
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt

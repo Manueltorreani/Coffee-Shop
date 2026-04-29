@@ -20,6 +20,10 @@ export const createTipoGastos = async (req, res) => {
 
     return res.status(201).json(nuevoTipoGasto);
   } catch (err) {
+    console.log("ERROR CODE:",err.code);
+     if (err.code === "P2002") {
+      return res.status(409).json({ error: "Tipo de gasto ya creado" });
+    }
     console.error("error creando tipo de gasto : ", err);
     res.status(500).json({ error: "error interno del servidor" });
   }

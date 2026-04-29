@@ -7,7 +7,7 @@ export default function TipoGastosForm (props){
    const [nombre, setNombre] = useState("edea");
    const [isActive, setIsActive] = useState(true);
    const [isModified, setIsModified] = useState(false);
-   
+   const [error , setError] = useState(null)
 
    useEffect( ()=> {
     if(props.isModified == true){
@@ -19,9 +19,15 @@ export default function TipoGastosForm (props){
 
     function handleCreate(){
         const fetchCreate = async () =>{
-            const res = await createTipoGasto({ nombre, estado: isActive });
-            props.onCreated?.();  // ← refresca la tabla
-            console.log(res);
+            try {
+                const res = await createTipoGasto({ nombre, estado: isActive });
+                setError(null)
+                props.onCreated?.();  // ← refresca la tabla
+                console.log(res);
+                
+            } catch (err) {
+                setError(err.message);
+            }
         }
         fetchCreate();
        
@@ -39,6 +45,7 @@ export default function TipoGastosForm (props){
                 <input className="p-2 border-2 border-blue-300 rounded-2xl bg-white " type="text" name="nombre" id="nombre" placeholder="luz"
                 value={nombre}
                 onChange={(e)=>setNombre(e.target.value)}/>
+                {error && <p className="text-red-500 text-xs">{error}</p>}
                 {nombre}
             </div>
              <div className="flex flex-row gap-2">Activo           
