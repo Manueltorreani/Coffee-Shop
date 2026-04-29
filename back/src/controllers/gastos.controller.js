@@ -3,9 +3,11 @@ import { prisma } from '../lib/prisma.js'
 // CREAR GASTO
 export const createGastos = async (req, res) => {
   try {
-    let { nombre, tipoGastoId } = req.body;
+    let { nombre,precio, tipoGastoId } = req.body;
 
     if (!nombre) return res.status(400).json({ error: "Nombre requerido" });
+    if (!precio) return res.status(400).json({ error: "precio requerido" });
+    if (!tipoGastoId) return res.status(400).json({ error: "tipo de Gasto requerido" });
 
     if (typeof nombre !== "string") {
       return res.status(400).json({ error: "el nombre no es una cadena de texto" });
@@ -19,6 +21,7 @@ export const createGastos = async (req, res) => {
     const nuevoGasto = await prisma.gastos.create({
       data: {
         nombre: nombre.trim(),
+        precio : precio,
         tipoGastoId: tipoId,
       },
     });
