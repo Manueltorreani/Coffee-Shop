@@ -8,9 +8,13 @@ export default function GastosPage(){
 
     const [paginaActual, setPaginaActual] = useState("gastos");
     const tipoGastosPanelRef = useRef(null);
+    const gastosPanelRef = useRef(null);
 
     function refrescarTipoGastos() {
         tipoGastosPanelRef.current?.fetchData();  // ← llama fetchData del panel
+    }
+    function refrescarGastos(){
+      gastosPanelRef.current?.fetchData();
     }
 
   return (
@@ -26,8 +30,8 @@ export default function GastosPage(){
       </div> 
       
       <div className="flex flex-row gap-2 flex-wrap">
-      { (paginaActual === "gastos") && <GastosForm/> } 
-      { (paginaActual === "gastos") && <GastosPanel/> } 
+      { (paginaActual === "gastos") && <GastosForm onCreated ={refrescarGastos}/> } 
+      { (paginaActual === "gastos") && <GastosPanel ref={gastosPanelRef}/> } 
       { (paginaActual === "tipodegastos") && <TipoGastosForm onCreated={refrescarTipoGastos}/>}
       { (paginaActual === "tipodegastos") &&  <TipoGastosPanel ref={tipoGastosPanelRef}/>}
       </div>
