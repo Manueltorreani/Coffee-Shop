@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useEffect } from "react";
+import { createTipoGasto } from "../../services/fetch/gastos";
 
 export default function TipoGastosForm (props){
    const [isOpen, setIsOpen] = useState(false);
    const [nombre, setNombre] = useState("edea");
    const [isActive, setIsActive] = useState(true);
    const [isModified, setIsModified] = useState(false);
+   
 
    useEffect( ()=> {
     if(props.isModified == true){
@@ -16,7 +18,13 @@ export default function TipoGastosForm (props){
     ,[]);
 
     function handleCreate(){
-        window.alert("Creando tipo de gasto");
+        const fetchCreate = async () =>{
+            const res = await createTipoGasto({ nombre, estado: isActive });
+            props.onCreated?.();  // ← refresca la tabla
+            console.log(res);
+        }
+        fetchCreate();
+       
     }
 
     function handleModified(){
