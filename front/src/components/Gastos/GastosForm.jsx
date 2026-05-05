@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { getTipoGastos } from "../../services/fetch/gastos";
 import { createGasto } from "../../services/fetch/gastos";
+import ModalLoading from "../ModalLoading";
 
 export default function GastosForm (props){
    const [nombre, setNombre] = useState("edea");
@@ -9,15 +10,18 @@ export default function GastosForm (props){
    const [tipoGastoId, setTipoGastoId] = useState("");
    const[tipoGastos, setTipoGastos] = useState([]);
    const [error, setError] = useState(null);
-
+   const [isLoading, setIsLoading] = useState(false)    
 
     const fetchData = async () => {
+        setIsLoading(true)
          try {
            const data = await getTipoGastos();
            setTipoGastos(data);
            console.log(data);
          } catch (error) {
            console.error("Error cargando tipos:", error);
+         }finally{
+            setIsLoading(false)
          }
        };
 
@@ -27,6 +31,7 @@ export default function GastosForm (props){
 
     function handleCreate(){
         const  fetchCreate = async() => {
+            setIsLoading(true)
             try {
                 const res = await createGasto({
                     nombre,
@@ -38,6 +43,8 @@ export default function GastosForm (props){
                 console.log(res);
             } catch (err) {
                 setError(err.message);
+            }finally{
+               setIsLoading(false)
             }
         }
         fetchCreate();
@@ -48,6 +55,8 @@ export default function GastosForm (props){
     }
 
     return (
+    <>    
+     { isLoading && <ModalLoading/>}
     <div className="w-[300px] bg-slate-100 text-black rounded-2xl shadow-md flex flex-col gap-3 py-6 px-4">
         Formulario de Gastos
         
@@ -86,6 +95,7 @@ export default function GastosForm (props){
             Crear
         </button>
     </div>
+    </>
 )
 
 }

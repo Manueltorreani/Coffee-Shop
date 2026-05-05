@@ -1,19 +1,23 @@
 import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from "react";
 import { deleteTipoGasto, getTipoGastos } from "../../services/fetch/gastos";
-import { Trash2 } from "lucide-react";
+import { Trash2, SquarePen  } from "lucide-react";
+import ModalLoading from "../ModalLoading";
 
   const TipoGastosPanel = forwardRef((props,ref) => {
    
     const [tipoDeGastos, setTipoDeGastos] = useState([])
-    
+    const [isLoading, setIsLoading] = useState(false)
 
     const fetchData = async () => {
+      setIsLoading(true)
       try {
         const data = await getTipoGastos();
         setTipoDeGastos(data);
         console.log(data);
       } catch (error) {
         console.error("Error cargando tipos:", error);
+      }finally{
+        setIsLoading(false)
       }
     };
     
@@ -25,15 +29,19 @@ import { Trash2 } from "lucide-react";
     
     const handleDelete = async (id) =>{
       if(!window.confirm("Eliminar este tipo de gasto?")) return;
+      setIsLoading(true)
       try {
         await deleteTipoGasto(id);
         fetchData();
       } catch (error) {
         console.error("Error eliminando:",error)
+      }finally{
+        setIsLoading(false)
       }
     }
     return(
         <> 
+        { isLoading && <ModalLoading/>}
         <div className="w-[420px] max-h-[400px] overflow-y-auto bg-white text-black rounded-2xl shadow" >
           <table className="w-full text-sm">
             <thead>
@@ -57,12 +65,17 @@ import { Trash2 } from "lucide-react";
                       {row.estado ?"activo":"inactivo"}
                     </span>
                   </td>
-                  <td className="px-3 py-2">
+                  <td className="px-3 py-2 flex flex-row">
                     <button
                       onClick={() => handleDelete(row.id)}
                       className="text-gray-400 hover:text-red-500 transition-colors"
                     >
                       <Trash2 size={15} />
+                    </button>
+                    <button className="text-gray-400 hover:text-amber-500 transition-colors"
+                     
+                     >
+                      <SquarePen size={15} />
                     </button>
                   </td>
                 </tr>

@@ -3,19 +3,23 @@ import { deleteGasto, getGastos } from "../../services/fetch/gastos";
 import { Trash2 } from "lucide-react";
 import { forwardRef, useRef } from "react";
 import { useImperativeHandle } from "react";
+import ModalLoading from "../ModalLoading";
 
 const GastosPanel = forwardRef ((props, ref) => {
 
        const [gastos, setGastos] = useState([])
-       
+       const [isLoading, setIsLoading] = useState(false)
    
        const fetchData = async () => {
+        setIsLoading(true)
          try {
            const data = await getGastos();
            setGastos(data);
            console.log(data);
          } catch (error) {
            console.error("Error cargando tipos:", error);
+         }finally{
+          setIsLoading(false)
          }
        };
        
@@ -27,15 +31,19 @@ const GastosPanel = forwardRef ((props, ref) => {
        
        const handleDelete = async (id) =>{
          if(!window.confirm("Eliminar este tipo de gasto?")) return;
+        setIsLoading(true)
          try {
            await deleteGasto(id);
            fetchData();
          } catch (error) {
            console.error("Error eliminando:",error)
+         }finally{
+          setIsLoading(false)
          }
        }
     return(
         <> 
+        { isLoading && <ModalLoading/>}
         <div className="w-[420px] max-h-[400px] overflow-y-auto bg-white text-black rounded-2xl shadow" >
           <table className="w-full text-sm">
             <thead>
