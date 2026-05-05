@@ -2,12 +2,14 @@ import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from "re
 import { deleteTipoGasto, getTipoGastos } from "../../services/fetch/gastos";
 import { Trash2, SquarePen  } from "lucide-react";
 import ModalLoading from "../ModalLoading";
+import TipoGastosForm from "./TipoGastosForm";
 
   const TipoGastosPanel = forwardRef((props,ref) => {
    
     const [tipoDeGastos, setTipoDeGastos] = useState([])
     const [isLoading, setIsLoading] = useState(false)
-
+    const [isModified, setIsModified] =  useState(false)
+  
     const fetchData = async () => {
       setIsLoading(true)
       try {
@@ -16,9 +18,11 @@ import ModalLoading from "../ModalLoading";
         console.log(data);
       } catch (error) {
         console.error("Error cargando tipos:", error);
+
       }finally{
         setIsLoading(false)
-      }
+
+      } 
     };
     
     useImperativeHandle(ref, () => ({ fetchData }));  // ← exponés fetchData al padre
@@ -40,9 +44,11 @@ import ModalLoading from "../ModalLoading";
       }
     }
     return(
-        <> 
+      <> 
         { isLoading && <ModalLoading/>}
+         { isModified && <ModalModified/>}
         <div className="w-[420px] max-h-[400px] overflow-y-auto bg-white text-black rounded-2xl shadow" >
+         
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-gray-50 text-xs text-gray-500 font-medium">
@@ -89,3 +95,15 @@ import ModalLoading from "../ModalLoading";
 
 });
 export default TipoGastosPanel; 
+
+ const  ModalModified = () => {
+  return (
+    <div className='fixed z-90 inset-0 bg-black/50 flex justify-center items-center'>
+      <div className='bg-white p-4 rounded-lg shadow'>
+          <TipoGastosForm/>
+          <h1>ajjajaja</h1>
+      </div>
+    </div>
+  )
+}
+

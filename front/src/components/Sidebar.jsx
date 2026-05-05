@@ -1,5 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { useAuth } from '../context/AuthContext.jsx'
+import  Image  from '../assets/img/LOGO.jpeg'
+import Letras from '../assets/img/LOGOLETRAS.png'
 
     const linkStyle = {
         display : 'flex', alignItems:'center', gap:10,
@@ -14,12 +16,10 @@ import { useAuth } from '../context/AuthContext.jsx'
     <div style={{ padding:16 }}>
       {/* Logo simple */}
       <NavLink to="/" end>
-        <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:20 }}>
-          <div style={{
-            width:36, height:36, borderRadius:8,
-            background:'var(--blue-600)'
-          }} />
-          <strong>Coffee Admin</strong>
+        <div style={{ display:'flex', alignItems:'center', gap:3, marginBottom:20 }}>
+          <img src={Image} className="h-15"
+          > </img>
+          <img src={Letras} className="h-4"/>
         </div>
       </NavLink>
 

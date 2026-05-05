@@ -4,6 +4,8 @@ import Sidebar from '../components/Sidebar.jsx'
 import Topbar from '../components/Topbar.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { clearToken } from '../lib/auth.js'
+import  Image  from '../assets/img/LOGOSINFONDO.png'
+import Letras from '../assets/img/LOGOLETRAS.png'
 
 export default function DashboardLayout() {
   const navigate = useNavigate()
@@ -14,16 +16,6 @@ export default function DashboardLayout() {
     logout()
     navigate('/login', { replace: true })
   }
-
-  // 🔁 Redirección por rol
-  /*useEffect(() => {
-    if (!user) return
-
-    // Usuario normal → solo carta
-    if (!user.isAdmin && window.location.pathname !== '/') {
-      navigate('/', { replace: true })
-    }
-  }, [user, navigate])*/
 
   return (
     <div
@@ -64,13 +56,27 @@ export default function DashboardLayout() {
         {/* Main */}
         <main
           style={{
-            width: '100%',
-            height: '100%',
-            padding: '20px',
-            overflow: 'auto',
-          }}
+          position: 'relative',
+          width: '100%',
+          height: '100%',
+          padding: '20px',
+          overflow: 'auto',
+        }}
         >
-          <div className="card" style={{ padding: 20 }}>
+          <img
+          src={Image}
+          alt="bg"
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            right: 0,
+            width: '400px',
+            opacity: 0.45,
+            pointerEvents: 'none',
+            zIndex: 0
+          }}
+        />
+          <div className="card z-10" style={{ padding: 20 }}>
             <Outlet />
           </div>
         </main>

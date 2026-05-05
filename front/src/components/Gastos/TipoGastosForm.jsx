@@ -11,6 +11,7 @@ export default function TipoGastosForm (props){
    const [error , setError] = useState(null)
    const [isLoading, setIsLoading] = useState(false)
 
+
    useEffect( ()=> {
     if(props.isModified == true){
         setNombre(props.tipoGastos.nombre);
@@ -39,7 +40,7 @@ export default function TipoGastosForm (props){
     }
 
     function handleModified(){
-            window.alert("Modificando tipo de gasto");
+        
     }
 
     return(
