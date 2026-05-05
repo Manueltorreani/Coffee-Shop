@@ -5,15 +5,19 @@ import { Trash2 } from "lucide-react";
   const TipoGastosPanel = forwardRef((props,ref) => {
    
     const [tipoDeGastos, setTipoDeGastos] = useState([])
+    const [cargando, setCargando] = useState(true);
     
 
     const fetchData = async () => {
+      setCargando(true);
       try {
         const data = await getTipoGastos();
         setTipoDeGastos(data);
         console.log(data);
       } catch (error) {
         console.error("Error cargando tipos:", error);
+      } finally {
+        setCargando(true);
       }
     };
     
@@ -33,7 +37,8 @@ import { Trash2 } from "lucide-react";
       }
     }
     return(
-        <> 
+        <>
+        {cargando && <ModalCargando/>}
         <div className="w-[420px] max-h-[400px] overflow-y-auto bg-white text-black rounded-2xl shadow" >
           <table className="w-full text-sm">
             <thead>
@@ -76,3 +81,13 @@ import { Trash2 } from "lucide-react";
 
 });
 export default TipoGastosPanel; 
+
+const ModalCargando = () => {
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div className="bg-white p-4 rounded-lg shadow">
+        <p className="text-gray-700">Cargando...</p>
+      </div>
+    </div>
+  );
+}

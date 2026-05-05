@@ -15,16 +15,6 @@ export default function DashboardLayout() {
     navigate('/login', { replace: true })
   }
 
-  // 🔁 Redirección por rol
-  /*useEffect(() => {
-    if (!user) return
-
-    // Usuario normal → solo carta
-    if (!user.isAdmin && window.location.pathname !== '/') {
-      navigate('/', { replace: true })
-    }
-  }, [user, navigate])*/
-
   return (
     <div
       style={{
@@ -64,12 +54,26 @@ export default function DashboardLayout() {
         {/* Main */}
         <main
           style={{
-            width: '100%',
-            height: '100%',
-            padding: '20px',
-            overflow: 'auto',
-          }}
+          position: 'relative',
+          width: '100%',
+          height: '100%',
+          padding: '20px',
+          overflow: 'auto',
+        }}
         >
+          <img
+          src={'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_gqHa6rQaGS953exXhUyKG1p3VnC7wOc3KQ&s'}
+          alt="bg"
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            right: 0,
+            width: '400px',
+            opacity: 0.45,
+            pointerEvents: 'none',
+            zIndex: 0
+          }}
+        />
           <div className="card" style={{ padding: 20 }}>
             <Outlet />
           </div>
