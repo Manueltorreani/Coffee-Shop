@@ -18,7 +18,7 @@ export default function GastosPage(){
     }
 
   return (
-    <div className="flex flex-col w-full h-full p-4 gap-4 justify-around items-center z-10 ">
+    <div className="flex flex-col w-full h-full p-4 gap-4 justify-start items-start z-10 ">
      <div className="flex flex-row gap-2 flex-wrap"> 
       <button className="text-xl font-bold text-gray-700 bg-white border-2 border-black" 
       onClick={()=>{setPaginaActual("gastos")}}
