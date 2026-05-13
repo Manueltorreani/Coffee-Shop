@@ -39,7 +39,7 @@ export default function DashboardLayout() {
       >
         <Sidebar />
       </aside>
-      <div style={{ display:'flex', flexDirection:'column', width:'100%'}} >
+      <div style={{ display:'flex', flexDirection:'column', width:'100%', height: '100%' }} >
         {/* Topbar */}
         <header
           style={{
@@ -52,32 +52,48 @@ export default function DashboardLayout() {
           <Topbar userName={user?.nombre || 'usuario'} onLogout={handleLogout} />
         </header>
 
-
         {/* Main */}
         <main
           style={{
-          position: 'relative',
-          width: '100%',
-          height: '100%',
-          padding: '20px',
-          overflow: 'auto',
-        }}
-        >
-          <img
-          src={Image}
-          alt="bg"
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            right: 0,
-            width: '400px',
-            opacity: 0.45,
-            pointerEvents: 'none',
-            zIndex: 0
+            display: 'flex',
+            flexDirection: 'column',
+            flex: 1, 
+            width: '100%',
+            padding: '20px',
+            overflow: 'auto',
+            backgroundColor: '#f3f4f6', 
           }}
-        />
-          <div className="card z-10" style={{ padding: 20 }}>
-            <Outlet />
+        >
+          {/* CONTENEDOR BLANCO*/}
+          <div 
+            className="card" 
+            style={{ 
+              position: 'relative',
+              flex: 1,
+              backgroundColor: '#ffffff',
+              padding: '20px',
+              borderRadius: '8px',
+            }}
+          >
+            {/* LOGO COMO MARCA DE AGUA*/}
+            <img
+              src={Image}
+              alt="bg"
+              style={{
+                position: 'absolute', 
+                bottom: '20px',
+                right: '20px',
+                width: '400px',
+                opacity: 0.10,
+                pointerEvents: 'none',
+                zIndex: 0
+              }}
+            />
+
+            {/* LAS PÁGINAS */}
+            <div style={{ position: 'relative', zIndex: 10, width: '100%', height: '100%' }}>
+              <Outlet />
+            </div>
           </div>
         </main>
       </div>
