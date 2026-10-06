@@ -6,3 +6,7 @@ node_modules
 
 /src/generated/prisma
 # para que no se suba el código generado por Prisma, que es específico de cada entorno y se puede regenerar con prisma generate
+
+prisma/dev.db
+prisma/dev.db-journal
+# para que no se suba la base de datos local (SQLite); cada uno tiene la suya y se genera con prisma migrate dev
