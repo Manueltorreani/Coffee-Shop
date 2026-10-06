@@ -3,7 +3,7 @@ import { prisma } from '../lib/prisma.js'
 // CREAR GASTO
 export const createGastos = async (req, res) => {
   try {
-    let { nombre,precio, tipoGastoId } = req.body;
+    let { nombre,precio, tipoGastoId, paymentMethod } = req.body;
 
     if (!nombre) return res.status(400).json({ error: "Nombre requerido" });
     if (!precio) return res.status(400).json({ error: "precio requerido" });
@@ -21,8 +21,9 @@ export const createGastos = async (req, res) => {
     const nuevoGasto = await prisma.gastos.create({
       data: {
         nombre: nombre.trim(),
-        precio : precio,
+        precio : Number(precio),
         tipoGastoId: tipoId,
+        paymentMethod: paymentMethod || null, // texto (ej: "Efectivo"), opcional
       },
     });
 
@@ -36,7 +37,7 @@ export const createGastos = async (req, res) => {
 // ACTUALIZAR GASTO
 export const updateGasto = async (req, res) => {
   try {
-    const { nombre, estado, tipoGastoId } = req.body;
+    const { nombre, precio, tipoGastoId, paymentMethod } = req.body;
     const id = Number(req.params.id);
 
     if (Number.isNaN(id)) {
@@ -52,11 +53,17 @@ export const updateGasto = async (req, res) => {
       data.nombre = nombre.trim();
     }
 
-    if (estado !== undefined) {
-      if (typeof estado !== "boolean") {
-        return res.status(400).json({ error: "estado inválido" });
+    // (antes aceptaba "estado", pero el modelo Gastos no tiene ese campo y Prisma tiraba error 500)
+    if (precio !== undefined) {
+      const precioNum = Number(precio);
+      if (Number.isNaN(precioNum) || precioNum <= 0) {
+        return res.status(400).json({ error: "precio inválido" });
       }
-      data.estado = estado;
+      data.precio = precioNum;
+    }
+
+    if (paymentMethod !== undefined) {
+      data.paymentMethod = paymentMethod || null;
     }
 
     if (tipoGastoId !== undefined) {
@@ -114,6 +121,7 @@ export const getGastos = async (req, res) => {
           select: { nombre: true },
         },
       },
+      orderBy: { createdAt: "desc" }, // los más nuevos primero
     });
 
     return res.status(200).json(gastos);

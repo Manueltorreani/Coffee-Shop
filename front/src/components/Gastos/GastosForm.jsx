@@ -1,14 +1,21 @@
 import { useState } from "react";
 import { useEffect } from "react";
 import { getTipoGastos } from "../../services/fetch/gastos";
-import { createGasto } from "../../services/fetch/gastos";
+import { createGasto, updateGasto } from "../../services/fetch/gastos";
+import { getPaymentMethods } from "../../services/fetch/paymentMethods";
 import ModalLoading from "../ModalLoading";
 
+// Sirve para CREAR y para EDITAR (mismo patrón que TipoGastosForm):
+// - crear: <GastosForm onCreated={...}/>
+// - editar: <GastosForm isModified={true} gasto={fila} onCreated={...}/>
 export default function GastosForm (props){
-   const [nombre, setNombre] = useState("edea");
+   const [nombre, setNombre] = useState("");
    const [precio, setPrecio] = useState("");
    const [tipoGastoId, setTipoGastoId] = useState("");
+   const [paymentMethod, setPaymentMethod] = useState("");
    const[tipoGastos, setTipoGastos] = useState([]);
+   const [paymentMethods, setPaymentMethods] = useState([]);
+   const [isModified, setIsModified] = useState(false);
    const [error, setError] = useState(null);
    const [isLoading, setIsLoading] = useState(false)    
 
@@ -16,8 +23,10 @@ export default function GastosForm (props){
         setIsLoading(true)
          try {
            const data = await getTipoGastos();
-           setTipoGastos(data);
-           console.log(data);
+           // solo tipos activos (o el que ya tiene el gasto que estamos editando)
+           setTipoGastos(data.filter((tipo) => tipo.estado || tipo.id === props.gasto?.tipoGastoId));
+           const metodos = await getPaymentMethods();
+           setPaymentMethods(metodos);
          } catch (error) {
            console.error("Error cargando tipos:", error);
          }finally{
@@ -27,6 +36,14 @@ export default function GastosForm (props){
 
    useEffect( ()=> {
     fetchData();
+    // si viene en modo edición, cargamos los datos de la fila en el form
+    if(props.isModified == true){
+        setIsModified(true);
+        setNombre(props.gasto.nombre);
+        setPrecio(props.gasto.precio);
+        setTipoGastoId(props.gasto.tipoGastoId ?? "");
+        setPaymentMethod(props.gasto.paymentMethod ?? "");
+    }
     },[]);
 
     function handleCreate(){
@@ -36,9 +53,12 @@ export default function GastosForm (props){
                 const res = await createGasto({
                     nombre,
                     precio: Number(precio),
-                    tipoGastoId:Number(tipoGastoId)
+                    tipoGastoId:Number(tipoGastoId),
+                    paymentMethod
                 });
                 setError(null);
+                setNombre(""); // limpiamos el form para cargar otro
+                setPrecio("");
                 props.onCreated?.();
                 console.log(res);
             } catch (err) {
@@ -51,33 +71,52 @@ export default function GastosForm (props){
     }
 
     function handleModified(){
-            window.alert("Modificando tipo de gasto");
+        const fetchUpdate = async () => {
+            setIsLoading(true)
+            try {
+                const res = await updateGasto(props.gasto.id, {
+                    nombre,
+                    precio: Number(precio),
+                    tipoGastoId: Number(tipoGastoId),
+                    paymentMethod
+                });
+                setError(null);
+                props.onCreated?.(); // refresca la tabla y cierra el modal
+                console.log(res);
+            } catch (err) {
+                setError(err.message);
+            }finally{
+               setIsLoading(false)
+            }
+        }
+        fetchUpdate();
     }
 
     return (
     <>    
      { isLoading && <ModalLoading/>}
-    <div className="w-[300px] bg-slate-100 text-black rounded-2xl shadow-md flex flex-col gap-3 py-6 px-4">
-        Formulario de Gastos
+    <div className="form-card">
+        <h3 className="form-titulo">{isModified ? "Editar gasto" : "Formulario de Gastos"}</h3>
         
-        <div className="flex flex-col gap-2">Nombre
-            <input className="p-2 border-2 border-blue-300 rounded-2xl bg-white"
+        <div className="form-campo">Nombre
+            <input className="form-input"
                 type="text"
+                placeholder="edea"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
             />
         </div>
 
-        <div className="flex flex-col gap-2">Precio
-            <input className="p-2 border-2 border-blue-300 rounded-2xl bg-white"
+        <div className="form-campo">Precio
+            <input className="form-input"
                 type="number"
                 value={precio}
                 onChange={(e) => setPrecio(e.target.value)}
             />
         </div>
 
-        <div className="flex flex-col gap-2">Categoría
-            <select className="p-2 border-2 border-blue-300 rounded-2xl bg-white"
+        <div className="form-campo">Categoría
+            <select className="form-input"
                 value={tipoGastoId}
                 onChange={(e) => setTipoGastoId(e.target.value)}
             >
@@ -88,11 +127,29 @@ export default function GastosForm (props){
             </select>
         </div>
 
+        <div className="form-campo">Método de pago
+            <select className="form-input"
+                value={paymentMethod}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+            >
+                <option value="">No definido</option>
+                {paymentMethods.map((metodo) =>(
+                    <option key={metodo.id} value={metodo.nombre}>{metodo.nombre}</option>
+               ) )}
+            </select>
+        </div>
+
         {error && <p className="text-red-500 text-xs">{error}</p>}
 
-        <button className="bg-blue-500 text-white p-2 rounded-xl"
-            onClick={handleCreate}>
-            Crear
+        <button className="btn-primario"
+            onClick={() => {
+                if(isModified){
+                    handleModified();
+                }else{
+                    handleCreate();
+                }
+            }}>
+            {isModified ? "Guardar cambios" : "Crear"}
         </button>
     </div>
     </>

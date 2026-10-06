@@ -65,6 +65,9 @@ export const updateTipoGasto = async (req, res) => {
     if (err.code === "P2025") {
       return res.status(404).json({ error: "Tipo de gasto no encontrado" });
     }
+    if (err.code === "P2002") { // al editar también puede chocar con un nombre existente
+      return res.status(409).json({ error: "Tipo de gasto ya creado" });
+    }
     console.error("error actualizando tipo de gasto : ", err);
     res.status(500).json({ error: "error interno del servidor" });
   }

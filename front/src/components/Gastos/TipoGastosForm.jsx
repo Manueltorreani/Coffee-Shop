@@ -1,23 +1,27 @@
 import { useState } from "react";
 import { useEffect } from "react";
-import { createTipoGasto } from "../../services/fetch/gastos";
+import { createTipoGasto, updateTipoGasto } from "../../services/fetch/gastos";
 import ModalLoading from "../ModalLoading";
 
+// Sirve para CREAR y para EDITAR:
+// - crear: <TipoGastosForm onCreated={...}/>
+// - editar: <TipoGastosForm isModified={true} tipoGastos={fila} onCreated={...}/>
 export default function TipoGastosForm (props){
-   const [isOpen, setIsOpen] = useState(false);
-   const [nombre, setNombre] = useState("edea");
+   const [nombre, setNombre] = useState("");
    const [isActive, setIsActive] = useState(true);
    const [isModified, setIsModified] = useState(false);
    const [error , setError] = useState(null)
    const [isLoading, setIsLoading] = useState(false)
 
 
+   // si viene en modo edición, cargamos los datos de la fila en el form
    useEffect( ()=> {
     if(props.isModified == true){
+        setIsModified(true);
         setNombre(props.tipoGastos.nombre);
-        setIsActive(props.tipoGastos.isActive);
+        setIsActive(props.tipoGastos.estado);
     }
-   } 
+   }
     ,[]);
 
     function handleCreate(){
@@ -26,9 +30,10 @@ export default function TipoGastosForm (props){
             try {
                 const res = await createTipoGasto({ nombre, estado: isActive });
                 setError(null)
+                setNombre("") // limpiamos el form para cargar otro
                 props.onCreated?.();  // ← refresca la tabla
                 console.log(res);
-                
+
             } catch (err) {
                 setError(err.message);
             }finally{
@@ -36,40 +41,51 @@ export default function TipoGastosForm (props){
             }
         }
         fetchCreate();
-       
+
     }
 
     function handleModified(){
-        
+        const fetchUpdate = async () =>{
+            setIsLoading(true)
+            try {
+                const res = await updateTipoGasto(props.tipoGastos.id, { nombre, estado: isActive });
+                setError(null)
+                props.onCreated?.();  // ← refresca la tabla y cierra el modal
+                console.log(res);
+            } catch (err) {
+                setError(err.message); // ej: 409 nombre repetido
+            }finally{
+                setIsLoading(false)
+            }
+        }
+        fetchUpdate();
     }
 
     return(
-        <> 
+        <>
         { isLoading && <ModalLoading/>}
-        <div className="w-[300px] h-[300px] bg-slate-100 text-black rounded-2xl shadow-md flex flex-col gap-3 justify-between py-6 px-4.5" >
-            Formulario de tipo de Gastos 
-            <div className="flex flex-col gap-2">Nombre de categoria 
-                <input className="p-2 border-2 border-blue-300 rounded-2xl bg-white " type="text" name="nombre" id="nombre" placeholder="luz"
+        <div className="form-card">
+            <h3 className="form-titulo">{isModified ? "Editar tipo de gasto" : "Formulario de tipo de Gastos"}</h3>
+            <div className="form-campo">Nombre de categoria
+                <input className="form-input" type="text" name="nombre" id="nombre" placeholder="luz"
                 value={nombre}
                 onChange={(e)=>setNombre(e.target.value)}/>
                 {error && <p className="text-red-500 text-xs">{error}</p>}
-                {nombre}
             </div>
-             <div className="flex flex-row gap-2">Activo           
+             <div className="flex flex-row gap-2 items-center text-sm font-medium text-slate-600">Activo
                 <input className="w-5 h-5 " type="checkbox" name="activo" id="activo"
                 checked={isActive}
                 onChange={(e)=>setIsActive(e.target.checked)}/>
-                {isActive?"true":"false"} 
             </div>
-                <button className="bg-blue-500 text-white " onClick={ () => {
+                <button className="btn-primario" onClick={ () => {
                 if(isModified){
                     handleModified();
                 }else{
                     handleCreate();
                 }
-            }} > 
+            }} >
                 {
-                    (isModified)?"modificando": "creando"
+                    (isModified)?"Guardar cambios": "Crear"
                 }
             </button>
         </div>

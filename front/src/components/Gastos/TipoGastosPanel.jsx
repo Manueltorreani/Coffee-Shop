@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from "react";
 import { deleteTipoGasto, getTipoGastos } from "../../services/fetch/gastos";
-import { Trash2, SquarePen  } from "lucide-react";
+import { Trash2, SquarePen } from "lucide-react";
+import ModalModified from "../ModalModified";
 import ModalLoading from "../ModalLoading";
 import TipoGastosForm from "./TipoGastosForm";
 
@@ -8,7 +9,7 @@ import TipoGastosForm from "./TipoGastosForm";
    
     const [tipoDeGastos, setTipoDeGastos] = useState([])
     const [isLoading, setIsLoading] = useState(false)
-    const [isModified, setIsModified] =  useState(false)
+    const [editando, setEditando] = useState(null) // fila que se está editando (null = modal cerrado)
   
     const fetchData = async () => {
       setIsLoading(true)
@@ -43,15 +44,26 @@ import TipoGastosForm from "./TipoGastosForm";
         setIsLoading(false)
       }
     }
+
+    // cuando el form de edición guarda: cerramos el modal y refrescamos la tabla
+    function handleEditado(){
+      setEditando(null);
+      fetchData();
+    }
+
     return(
       <> 
         { isLoading && <ModalLoading/>}
-         { isModified && <ModalModified/>}
-        <div className="w-[420px] max-h-[400px] overflow-y-auto bg-white text-black rounded-2xl shadow" >
+        { editando && (
+          <ModalModified onClose={() => setEditando(null)}>
+            <TipoGastosForm isModified={true} tipoGastos={editando} onCreated={handleEditado}/>
+          </ModalModified>
+        )}
+        <div className="tabla-card w-[420px] max-h-[400px]" >
          
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50 text-xs text-gray-500 font-medium">
+              <tr className="tabla-head">
                 <th className="px-4 py-3 text-left w-[30px]">#</th>
                 <th className="px-4 py-3 text-left">Nombre</th>
                 <th className="px-4 py-3 text-left w-[80px]">Estado</th>
@@ -71,7 +83,7 @@ import TipoGastosForm from "./TipoGastosForm";
                       {row.estado ?"activo":"inactivo"}
                     </span>
                   </td>
-                  <td className="px-3 py-2 flex flex-row">
+                  <td className="px-3 py-2 flex flex-row gap-2">
                     <button
                       onClick={() => handleDelete(row.id)}
                       className="text-gray-400 hover:text-red-500 transition-colors"
@@ -79,7 +91,7 @@ import TipoGastosForm from "./TipoGastosForm";
                       <Trash2 size={15} />
                     </button>
                     <button className="text-gray-400 hover:text-amber-500 transition-colors"
-                     
+                      onClick={() => setEditando(row)}
                      >
                       <SquarePen size={15} />
                     </button>
@@ -95,15 +107,4 @@ import TipoGastosForm from "./TipoGastosForm";
 
 });
 export default TipoGastosPanel; 
-
- const  ModalModified = () => {
-  return (
-    <div className='fixed z-90 inset-0 bg-black/50 flex justify-center items-center'>
-      <div className='bg-white p-4 rounded-lg shadow'>
-          <TipoGastosForm/>
-          <h1>ajjajaja</h1>
-      </div>
-    </div>
-  )
-}
 
