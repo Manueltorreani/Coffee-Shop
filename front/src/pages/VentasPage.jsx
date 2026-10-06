@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
   Plus, Search, Trash2, Calendar, 
-  CheckCircle, XCircle, Clock, Minus, PlusCircle, Save, X
+  CheckCircle, XCircle, Clock, Minus, PlusCircle, Save, X, Printer, ChefHat
 } from 'lucide-react';
+import { getConfig } from '../services/fetch/config.js';
+import Ticket from '../components/Ticket.jsx';
 import { getOrders, createOrder, updateOrderStatus,updateOrderItems } from '../services/fetch/orders.js';
 import { fetchProducts } from '../api/products.js';
 import { getPaymentMethods } from '../services/fetch/paymentMethods';
@@ -31,6 +33,10 @@ export default function VentasPage() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [paymentMethods, setPaymentMethods] = useState([]);
 
+  // Impresión: config del local + qué imprimir ({ orden, tipo: 'ticket' | 'comanda' } o null)
+  const [config, setConfig] = useState(null);
+  const [impresion, setImpresion] = useState(null);
+
 
 
   // --- CARGA INICIAL ---
@@ -58,6 +64,17 @@ export default function VentasPage() {
     }
 
     loadPaymentMethods();
+
+    async function loadConfig() {
+      try {
+        const data = await getConfig();
+        setConfig(data);
+      } catch (err) {
+        console.error("Error cargando configuración:", err);
+      }
+    }
+
+    loadConfig();
   }, []);
 
   // 2. Cargar órdenes según fecha
@@ -95,7 +112,7 @@ export default function VentasPage() {
   // --- ACCIONES ---
   const handleCreateOrder = async () => {
     try {
-      const newOrder = await createOrder({ userId: 1, items: [] }); 
+      const newOrder = await createOrder({ items: [] }); // el back toma el usuario del token
       setOrders([newOrder, ...orders]);
       setSelectedOrder(newOrder);
     } catch (error) {
@@ -130,11 +147,17 @@ export default function VentasPage() {
   const handleChangeStatus = async (id, data) => {
     if (!window.confirm(`¿Actualizar orden #${id}?`)) return;
     try {
-      await updateOrderStatus(id, data);
+      const ordenActualizada = await updateOrderStatus(id, data);
+
+      // Si se cobró y en Configuración está activado "imprimir al cobrar", imprimimos el ticket
+      if (data.status === 'COMPLETED' && config?.imprimirAlCobrar && selectedOrder?.id === id) {
+        setImpresion({ orden: { ...selectedOrder, ...ordenActualizada }, tipo: 'ticket' });
+      }
+
       loadOrders();
       if (selectedOrder?.id === id) setSelectedOrder(null);
     } catch (error) {
-      alert("Error al actualizar");
+      alert("Error al actualizar: " + error.message); // muestra el mensaje del back (ej: falta método de pago)
     }
   };
 
@@ -150,13 +173,17 @@ export default function VentasPage() {
 
   return (
     <div className="flex flex-col md:flex-row w-full h-screen bg-gray-50 overflow-hidden">
-      
+      {/* Ticket/Comanda: se monta, imprime y se desmonta solo */}
+      {impresion && (
+        <Ticket orden={impresion.orden} config={config} tipo={impresion.tipo} onAfterPrint={() => setImpresion(null)} />
+      )}
+
       {/* COLUMNA IZQUIERDA: LISTADO DE VENTAS */}
       <div className="w-full md:w-1/3 flex flex-col border-r bg-white">
         <div className="p-4 border-b space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-bold text-gray-800 italic">Ventas</h2>
-            <button onClick={handleCreateOrder} className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg flex items-center gap-2 text-sm font-bold transition">
+            <button onClick={handleCreateOrder} className="bg-surf-600 hover:bg-surf-700 text-white px-3 py-2 rounded-lg flex items-center gap-2 text-sm font-bold transition">
               <Plus size={18} /> Nueva Orden
             </button>
           </div>
@@ -164,7 +191,7 @@ export default function VentasPage() {
             <div className="flex flex-row items-center gap-3 bg-white p-2 rounded-xl border border-gray-200 shadow-sm">
             {/* Botón Hoy */}
             <button 
-              className='px-3 py-2 text-sm font-semibold rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors' 
+              className='px-3 py-2 text-sm font-semibold rounded-lg bg-surf-50 text-surf-600 hover:bg-surf-100 transition-colors' 
               onClick={() => setFilterDate(getTodayInUTC3())}
             >
               Hoy
@@ -180,7 +207,7 @@ export default function VentasPage() {
                 type="date" 
                 value={filterDate || ""} // Evita el error de "uncontrolled component"
                 onChange={(e) => setFilterDate(e.target.value)} 
-                className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none font-medium text-gray-700 text-sm"
+                className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-surf-500 outline-none font-medium text-gray-700 text-sm"
               />
             </div>
 
@@ -214,7 +241,7 @@ export default function VentasPage() {
                 <div 
                   key={order.id} 
                   onClick={() => setSelectedOrder(order)} 
-                  className={`p-4 border-b cursor-pointer transition border-l-4 ${statusColors[order.status]} ${selectedOrder?.id === order.id ? 'bg-blue-50' : 'hover:bg-gray-50'}`}
+                  className={`p-4 border-b cursor-pointer transition border-l-4 ${statusColors[order.status]} ${selectedOrder?.id === order.id ? 'bg-surf-50' : 'hover:bg-gray-50'}`}
                 >
                   <div className="flex justify-between items-start mb-1">
                     <span className="font-bold text-gray-700">{order.client || 'Cliente no definido'}</span><span className="font-bold text-gray-700">{' - '}Orden #{order.id}</span>
@@ -319,7 +346,7 @@ export default function VentasPage() {
                     </label>
 
                     <button
-                      className='flex flex-row text-white bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg font-bold items-center gap-2 transition'
+                      className='flex flex-row text-white bg-surf-500 hover:bg-surf-600 px-4 py-2 rounded-lg font-bold items-center gap-2 transition'
                       onClick={() =>
                         handleChangeStatus(selectedOrder.id, {
                           client: selectedOrder.client,
@@ -336,9 +363,31 @@ export default function VentasPage() {
                     </div>
               </div>
               <div className="flex gap-2">
+                {/* Imprimir: comanda (para la barra/cocina) y ticket (para el cliente) */}
+                <button
+                  onClick={() => setImpresion({ orden: selectedOrder, tipo: 'comanda' })}
+                  disabled={!selectedOrder.items?.length}
+                  title="Imprimir comanda"
+                  className="bg-white text-gray-700 border border-gray-300 px-3 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-gray-50 transition disabled:opacity-40"
+                >
+                  <ChefHat size={18} />
+                </button>
+                <button
+                  onClick={() => setImpresion({ orden: selectedOrder, tipo: 'ticket' })}
+                  disabled={!selectedOrder.items?.length}
+                  title="Imprimir ticket"
+                  className="bg-white text-gray-700 border border-gray-300 px-3 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-gray-50 transition disabled:opacity-40"
+                >
+                  <Printer size={18} />
+                </button>
                 {selectedOrder.status === 'PENDING' && (
                   <>
-                    <button onClick={() => handleChangeStatus(selectedOrder.id, {status: 'COMPLETED', paymentMethod: selectedOrder.paymentMethod})} className="bg-green-600 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-green-700 transition">
+                    <button
+                      onClick={() => handleChangeStatus(selectedOrder.id, {status: 'COMPLETED', paymentMethod: selectedOrder.paymentMethod})}
+                      disabled={!selectedOrder.paymentMethod} // sin método de pago no se puede cobrar
+                      title={!selectedOrder.paymentMethod ? 'Seleccioná un método de pago' : ''}
+                      className="bg-green-600 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-green-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
                       <CheckCircle size={18} /> Cobrar
                     </button>
                     <button onClick={() => handleChangeStatus(selectedOrder.id, {status: 'CANCELED'})} className="bg-white text-red-600 border border-red-200 px-4 py-2 rounded-lg font-bold hover:bg-red-50 transition">
@@ -360,7 +409,7 @@ export default function VentasPage() {
                     <input 
                       type="text"
                       placeholder="Buscar producto..."
-                      className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 outline-none transition-all font-bold"
+                      className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-surf-500 outline-none transition-all font-bold"
                       value={searchQuery}
                       onFocus={() => setShowDropdown(true)}
                       onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
@@ -376,10 +425,10 @@ export default function VentasPage() {
                             <div 
                               key={p.id}
                               onMouseDown={() => addItemToOrder(p)}
-                              className="h-[50px] px-4 flex items-center justify-between hover:bg-blue-600 hover:text-white cursor-pointer transition-colors border-b border-gray-50 last:border-0"
+                              className="h-[50px] px-4 flex items-center justify-between hover:bg-surf-600 hover:text-white cursor-pointer transition-colors border-b border-gray-50 last:border-0"
                             >
                               <span className="font-black italic uppercase text-sm">{p.nombre}</span>
-                              <span className="font-bold bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs group-hover:bg-blue-500">${p.precio?.toFixed(2)}</span>
+                              <span className="font-bold bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs group-hover:bg-surf-500">${p.precio?.toFixed(2)}</span>
                             </div>
                           ))
                         ) : (
@@ -427,7 +476,7 @@ export default function VentasPage() {
                               </button>
                             )}
                             
-                            <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg font-black text-xs min-w-[32px] text-center">
+                            <span className="bg-surf-100 text-surf-700 px-3 py-1 rounded-lg font-black text-xs min-w-[32px] text-center">
                               {item.cantidad}
                             </span>
 

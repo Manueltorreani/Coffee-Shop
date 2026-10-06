@@ -2,7 +2,7 @@ import { apiFetch } from "../api";
 
 /**
  * Crea una nueva orden (Apertura de caja / Venta)
- * @param {Object} orderData - { userId, items: [{ productId, quantity }] }
+ * @param {Object} orderData - { items: [{ productId, quantity }] } (el userId lo pone el back desde el token)
  */
 export const createOrder = async (orderData) => {
   return await apiFetch('/orders', {

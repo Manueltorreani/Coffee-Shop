@@ -43,18 +43,19 @@ router.put('/payment-methods/:id', verifyToken, verifyAdmin, updatePaymentMethod
 router.delete('/payment-methods/:id', verifyToken, verifyAdmin, deletePaymentMethod);
 
 // ==========================================
-// ÓRDENES - Creación y Actualización ADMIN
+// ÓRDENES - Creación y Actualización (empleados y admin)
+// Solo verifyToken: cualquier usuario logueado puede vender
 // ==========================================
 
 // Crear una nueva orden (Apertura de caja / Nueva venta)
 // POST /api/orders
-router.post('/', verifyToken, verifyAdmin, createOrder);
+router.post('/', verifyToken, createOrder);
 
 // Actualizar estado (Ej: PENDING -> COMPLETED o CANCELED)
 // PATCH /api/orders/:id/status
-router.patch('/:id/status', verifyToken, verifyAdmin, updateOrder);
+router.patch('/:id/status', verifyToken, updateOrder);
 
 // Actualizar items de una orden (Agregar/Quitar cantidad)
-router.put('/:id/items', verifyToken, verifyAdmin, updateOrderItems);
+router.put('/:id/items', verifyToken, updateOrderItems);
 
 export default router;

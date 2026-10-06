@@ -5,7 +5,8 @@ import {prisma} from '../lib/prisma.js'
  * Puede iniciar vacía o con productos ya seleccionados.
  */
 export const createOrder = async (req, res) => {
-  const { userId, items } = req.body; // items es un array: [{ productId, quantity }]
+  const { items } = req.body; // items es un array: [{ productId, quantity }]
+  const userId = req.user.id; // el usuario sale del token (verifyToken), no del body: asi nadie vende a nombre de otro
 
   try {
     // Usamos una transacción interactiva para asegurar integridad
@@ -151,10 +152,17 @@ export const updateOrder = async (req, res) => {
   if (req.body.paymentMethod !== undefined) {
     data.paymentMethod = req.body.paymentMethod; // 'CASH', 'CARD', etc. en string para mayor flexibilidad historica
   }
-    
-   
 
   try {
+    // Regla: no se puede cobrar (COMPLETED) sin método de pago, la caja necesita saber qué fue en efectivo
+    if (data.status === 'COMPLETED') {
+      const actual = await prisma.order.findUnique({ where: { id: Number(id) } });
+      const metodoFinal = data.paymentMethod !== undefined ? data.paymentMethod : actual?.paymentMethod;
+      if (!metodoFinal) {
+        return res.status(400).json({ error: 'Seleccioná un método de pago antes de cobrar' });
+      }
+    }
+
     const order = await prisma.order.update({
       where: { id: Number(id) },
       data: data,
@@ -352,23 +360,42 @@ export const getPaymentMethods = async (req, res) => {
 
 export const createPaymentMethod = async (req, res) => {
   try {
+    const { nombre } = req.body;
+    if (!nombre || typeof nombre !== 'string' || !nombre.trim()) {
+      return res.status(400).json({ error: 'Nombre requerido' });
+    }
+
     const method = await prisma.paymentMethod.create({
-      data: { nombre: req.body.nombre }
+      data: { nombre: nombre.trim() }
     });
-    res.json(method);
+    res.status(201).json(method);
   } catch (error) {
+    if (error.code === 'P2002') { // nombre @unique repetido
+      return res.status(409).json({ error: 'Método de pago ya creado' });
+    }
     res.status(500).json({ error: 'Error creando método' });
   }
 };
 
 export const updatePaymentMethod = async (req, res) => {
   try {
+    const { nombre } = req.body;
+    if (!nombre || typeof nombre !== 'string' || !nombre.trim()) {
+      return res.status(400).json({ error: 'Nombre requerido' });
+    }
+
     const method = await prisma.paymentMethod.update({
       where: { id: Number(req.params.id) },
-      data: { nombre: req.body.nombre }
+      data: { nombre: nombre.trim() }
     });
     res.json(method);
   } catch (error) {
+    if (error.code === 'P2002') {
+      return res.status(409).json({ error: 'Método de pago ya creado' });
+    }
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'Método de pago no encontrado' });
+    }
     res.status(500).json({ error: 'Error actualizando método' });
   }
 };
