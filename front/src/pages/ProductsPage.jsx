@@ -81,10 +81,10 @@ export default function ProductsPage(){
 
      return (
     <div className="w-full gap-5 flex flex-col" style={{margin: '40px auto', padding: '0 12px'}}>
-      <h1 className="text-2xl font-bold">Productos</h1>
+      <h1 className="text-2xl font-bold text-surf-800">Productos</h1>
       {editing ? (
-      <div className="p-4 rounded bg-blue-50">
-        <h2>{editing.id ? 'Editando producto: ' + editing.nombre : 'Creando nuevo producto'}</h2>
+      <div className="p-4 rounded-2xl bg-surf-50 border border-surf-100 flex flex-col gap-3">
+        <h2 className="font-bold text-surf-800">{editing.id ? 'Editando producto: ' + editing.nombre : 'Creando nuevo producto'}</h2>
         <ProductForm
           initialData={editing}
           onSave={async (data) => {
@@ -100,7 +100,7 @@ export default function ProductsPage(){
         />
       </div>
       ) : (
-      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={() => setEditing({})}>➕ Nuevo producto</button>
+      <button className="btn-primario self-start" onClick={() => setEditing({})}>➕ Nuevo producto</button>
     )}
       {/* Barra de búsqueda controlada (onSearch dispara setNombre) */}
       <SearchBar defaultValue={nombre} onSearch={handleSearch} />
@@ -111,7 +111,7 @@ export default function ProductsPage(){
         <label>
           Por página:&nbsp;
           {/* Al cambiar el limit, volvemos a page 1 para no quedar fuera de rango */}
-          <select value={limit} onChange={(e) => { setPage(1); setLimit(Number(e.target.value)) }}>
+          <select className="form-input py-1" value={limit} onChange={(e) => { setPage(1); setLimit(Number(e.target.value)) }}>
             <option value="5">5</option>
             <option value="10">10</option>
             <option value="25">25</option>

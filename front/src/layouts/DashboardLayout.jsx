@@ -31,11 +31,8 @@ export default function DashboardLayout() {
     >
       {/* Sidebar */}
       <aside
-        style={{
-          width: 240,
-          borderRight: `1px solid var(--border)`,
-          background: '#fff',
-        }}
+        style={{ width: 240, minWidth: 240 }}
+        className="bg-surf-600" // azul exacto del logo
       >
         <Sidebar />
       </aside>
@@ -61,18 +58,18 @@ export default function DashboardLayout() {
             width: '100%',
             padding: '20px',
             overflow: 'auto',
-            backgroundColor: '#f3f4f6', 
           }}
+          className="bg-surf-50" // fondo celeste muy suave de la paleta
         >
           {/* CONTENEDOR BLANCO*/}
           <div 
             className="card" 
-            style={{ 
+            style={{
               position: 'relative',
               flex: 1,
               backgroundColor: '#ffffff',
               padding: '20px',
-              borderRadius: '8px',
+              borderRadius: '16px',
             }}
           >
             {/* LOGO COMO MARCA DE AGUA*/}

@@ -1,7 +1,7 @@
 :root{
-  --blue-600: #2563eb;   /* azul base (botones, acentos) */
-  --blue-700: #1d4ed8;   /* hover */
-  --blue-50:  #eff6ff;   /* fondos suaves */
+  --blue-600: #016a99;   /* azul del logo (botones, acentos) */
+  --blue-700: #015a82;   /* hover */
+  --blue-50:  #eef7fb;   /* fondos suaves */
   --bg:       #f4f6fb;   /* fondo app */
   --card:     #ffffff;   /* tarjetas/paneles */
   --text:     #0f172a;   /* texto */
@@ -29,4 +29,4 @@ body { background: var(--bg); }
   padding:10px 12px; border:1px solid var(--border);
   border-radius:8px; background:#fff; outline:none;
 }
-.input:focus, select:focus { border-color: var(--blue-600); box-shadow:0 0 0 3px rgba(37,99,235,.15) }
+.input:focus, select:focus { border-color: var(--blue-600); box-shadow:0 0 0 3px rgba(1,106,153,.15) }

@@ -8,13 +8,13 @@ export default function Pagination({ page, totalPages, onPageChange}){
     const nextDisabled = page >= totalPages
     return (
         <div style={{display: 'flex', gap: 8, alignItems: 'center', marginTop: 12}}>
-            <button disabled={prevDisabled} onClick={() => onPageChange(page-1)}>
+            <button className="btn-secundario py-1" disabled={prevDisabled} onClick={() => onPageChange(page-1)}>
                anterior
             </button>
-            <span>
+            <span className="text-slate-600">
                 Pagina {page} de {totalPages}
             </span>
-            <button disabled={nextDisabled} onClick={() => onPageChange(page + 1)}>
+            <button className="btn-secundario py-1" disabled={nextDisabled} onClick={() => onPageChange(page + 1)}>
                 siguiente
             </button>
         </div>

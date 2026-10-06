@@ -99,8 +99,8 @@ export default function DashboardPage() {
 
           {/* Date Range Picker Container */}
           <div className="relative inline-block">
-            <div className="flex items-center bg-white border border-slate-200 rounded-2xl shadow-sm px-4 py-2.5 hover:border-blue-400 transition-all cursor-pointer group">
-              <Calendar size={20} className="text-blue-500 mr-3 group-hover:scale-110 transition-transform" />
+            <div className="flex items-center bg-white border border-slate-200 rounded-2xl shadow-sm px-4 py-2.5 hover:border-surf-400 transition-all cursor-pointer group">
+              <Calendar size={20} className="text-surf-500 mr-3 group-hover:scale-110 transition-transform" />
               <DatePicker
                 selected={startDate}
                 onChange={handleDateChange}
@@ -157,7 +157,7 @@ export default function DashboardPage() {
               <p className="text-sm text-slate-500">Visualización de la línea de tiempo completa</p>
             </div>
             {loading && (
-              <div className="flex items-center gap-2 text-blue-500 text-sm font-medium">
+              <div className="flex items-center gap-2 text-surf-500 text-sm font-medium">
                 <Loader2 className="animate-spin" size={18} /> Actualizando...
               </div>
             )}
@@ -168,8 +168,8 @@ export default function DashboardPage() {
               <AreaChart data={chartData}>
                 <defs>
                   <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.15}/>
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#016a99" stopOpacity={0.15}/>
+                    <stop offset="95%" stopColor="#016a99" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
@@ -188,11 +188,11 @@ export default function DashboardPage() {
                   tick={{ fill: '#64748b', fontSize: 12 }}
                   tickFormatter={(val) => `$${val}`}
                 />
-                <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#3b82f6', strokeWidth: 1 }} />
+                <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#016a99', strokeWidth: 1 }} />
                 <Area 
                   type="monotone" 
                   dataKey="total" 
-                  stroke="#3b82f6" 
+                  stroke="#016a99" 
                   strokeWidth={3}
                   fillOpacity={1} 
                   fill="url(#colorTotal)" 
@@ -213,7 +213,7 @@ export default function DashboardPage() {
 function StatCard({ label, value, icon, color, description }) {
   const themes = {
     emerald: "bg-emerald-50 text-emerald-600 border-emerald-100",
-    blue: "bg-blue-50 text-blue-600 border-blue-100",
+    blue: "bg-surf-50 text-surf-600 border-surf-100",
     violet: "bg-violet-50 text-violet-600 border-violet-100",
   };
 
@@ -240,7 +240,7 @@ function CustomTooltip({ active, payload, label }) {
           {label ? format(parseISO(label), "eeee, dd 'de' MMMM", { locale: es }) : ""}
         </p>
         <div className="space-y-1">
-          <p className="text-xl font-black text-blue-400">
+          <p className="text-xl font-black text-surf-400">
             ${payload[0].value.toLocaleString()}
           </p>
           <p className="text-xs text-slate-400 font-medium">

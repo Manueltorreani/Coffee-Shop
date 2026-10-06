@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { saveToken } from "../lib/auth";
 import { login, register } from '../services/auth.service'
 import { useAuth } from '../context/AuthContext.jsx'
+import Logo from '../assets/img/Chupete blanco.png'
 
 
 
@@ -82,21 +83,19 @@ export default function LoginPage(){
     }
 
      return (
-    <div style={{
-      minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', color:'black',
-      background:'var(--blue-50)'
-    }}>
+    // fondo con el azul del logo y tarjeta blanca al centro
+    <div className="min-h-screen flex items-center justify-center text-black bg-surf-600">
       <div className="card" style={{ width:380, padding:24 }}>
-        <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:16 }}>
-          <div style={{ width:36, height:36, borderRadius:8, background:'var(--blue-600)' }} />
-          <h2 style={{ margin:0 }}>{isRegister ? 'Registrarse' : 'Iniciar sesión'}</h2>
+        <div className="flex flex-col items-center gap-2 mb-4">
+          <img src={Logo} alt="Surf Coffee" className="h-28" />
+          <h2 className="m-0 text-xl font-bold text-surf-800">{isRegister ? 'Registrarse' : 'Iniciar sesión'}</h2>
         </div>
 
         <form onSubmit={isRegister ? handleRegister : handleLogin} style={{ display:'grid', gap:10, color:'black' }}>
           {isRegister && (
             <input
               style={{color:'black'}}
-              className="input"
+              className="form-input"
               type="text"
               placeholder="Nombre"
               value={nombre}
@@ -105,7 +104,7 @@ export default function LoginPage(){
           )}
           <input
             style={{color:'black'}}
-            className="input"
+            className="form-input"
             type="email"
             placeholder="Correo"
             value={email}
@@ -113,7 +112,7 @@ export default function LoginPage(){
           />
           <input
             style={{color:'black'}}
-            className="input"
+            className="form-input"
             type="password"
             placeholder="Contraseña"
             value={password}
@@ -122,12 +121,12 @@ export default function LoginPage(){
 
           {error && <div style={{ color:'#b91c1c', fontSize:14 }}>{error}</div>}
 
-          <button className="btn" type="submit">Ingresar</button>
+          <button className="btn-primario" type="submit">{isRegister ? "Registrarme" : "Ingresar"}</button>
         </form>
         <div style={{ marginTop:16, fontSize:14 }}>
           {isRegister ? '¿Ya tenés cuenta?' : '¿No tenés cuenta?'}&nbsp;
           <button
-            className="btn-link"
+            className="text-surf-600 font-semibold hover:underline"
             onClick={()=>setIsRegister(!isRegister)}
           >
             {isRegister ? 'Iniciá sesión' : 'Registrate'}

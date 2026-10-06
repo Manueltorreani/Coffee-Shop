@@ -8,7 +8,7 @@ export default function SortControls({ sortBy, sortOrder, onChange }) {
     <div style={{ display:'flex', gap:8, margin:'8px 0' }}>
       <label>
         Ordenar por:&nbsp;
-        <select
+        <select className="form-input py-1"
           value={sortBy}                                  // ← campo (id|nombre|precio)
           onChange={(e)=>onChange({ sortBy: e.target.value, sortOrder })} // NO tocar sortOrder acá
         >
@@ -20,7 +20,7 @@ export default function SortControls({ sortBy, sortOrder, onChange }) {
 
       <label>
         Dirección:&nbsp;
-        <select
+        <select className="form-input py-1"
           value={sortOrder}                               // ← dirección (asc|desc)
           onChange={(e)=>onChange({ sortBy, sortOrder: e.target.value })} // NO tocar sortBy acá
         >

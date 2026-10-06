@@ -53,29 +53,31 @@ export default function ProductForm ({initialData, onSave, onCancel}){
 
     return(
       <div className="flex w-full min-w-[400px] justify-center">
-        <form onSubmit={handleSubmit} className=" min-w-[400px] border p-4 rounded flex flex-col gap-4 items-start bg-white">
-        <label className="flex flex-row justify-between w-full">
+        <form onSubmit={handleSubmit} className="form-card min-w-[400px]">
+        <label className="form-campo w-full">
           Nombre:
           <input
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
             placeholder="Ej: Latte"
+            className="form-input"
           />
         </label>
 
-        <label className="flex flex-row justify-between w-full">
+        <label className="form-campo w-full">
           Precio:
           <input
             type="number"
             value={precio}
             onChange={(e) => setPrecio(e.target.value)}
             placeholder="Ej: 4500"
+            className="form-input"
           />
         </label>
         
-        <label className="flex flex-row justify-between w-full">
+        <label className="form-campo w-full">
           Categoria:
-          <select name="categoryId" id="categoryId" value={categoria} onChange={(e) => setCategoria(e.target.value)}>
+          <select className="form-input" name="categoryId" id="categoryId" value={categoria} onChange={(e) => setCategoria(e.target.value)}>
 
             {categories.map((cat) => (
               <option key={cat.id} value={cat.id}>
@@ -86,8 +88,8 @@ export default function ProductForm ({initialData, onSave, onCancel}){
         </label>
 
         <div className="flex flex-row justify-between w-full" style={{ display: 'flex', gap: 8 }}>
-          <button className="bg-blue-500 text-white hover:bg-blue-700" type="submit">Guardar</button>
-          <button className="bg-blue-500 text-white hover:bg-blue-700" type="button" onClick={onCancel}>Cancelar</button>
+          <button className="btn-primario" type="submit">Guardar</button>
+          <button className="btn-secundario" type="button" onClick={onCancel}>Cancelar</button>
         </div>
       </form>
 

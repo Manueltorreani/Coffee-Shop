@@ -1,92 +1,41 @@
 import { NavLink } from "react-router-dom";
 import { useAuth } from '../context/AuthContext.jsx'
-import  Image  from '../assets/img/LOGO.jpeg'
-import Letras from '../assets/img/LOGOLETRAS.png'
+import Logo from '../assets/img/Chupete blanco.png'
 
-    const linkStyle = {
-        display : 'flex', alignItems:'center', gap:10,
-        padding:'10px 14px', borderRadius : 8, color:'var(--text)', textDecoration:'none'
-    }
+    // Estilo de cada link: el activo queda blanco con texto azul, el resto blanco translúcido
+    // (una sola función en vez de repetir el mismo className en cada NavLink)
+    const linkClass = ({ isActive }) =>
+      `${isActive
+          ? 'bg-white text-surf-700 shadow-sm'
+          : 'text-white/85 hover:bg-white/10 hover:text-white'
+      } block text-start py-3 px-4 rounded-xl font-semibold transition-colors`
 
     export default function Sidebar (){
       const { user } = useAuth()
        if (!user) return null
 
         return (
-    <div style={{ padding:16 }}>
-      {/* Logo simple */}
+    <div className="h-full flex flex-col p-4">
+      {/* Logo redondo (círculo blanco con borde azul) sobre el fondo azul */}
       <NavLink to="/" end>
-        <div style={{ display:'flex', alignItems:'center', gap:3, marginBottom:20 }}>
-          <img src={Image} className="h-15"
-          > </img>
-          <img src={Letras} className="h-4"/>
+        <div className="flex flex-col items-center gap-2 mb-6 pt-2">
+          <img src={Logo} alt="Surf Coffee" className="h-28 drop-shadow-md" />
         </div>
       </NavLink>
 
-      <nav className="flex flex-col gap-6 mt-5" >
-          
-          <NavLink to="/ventas"
-            className={({ isActive }) =>
-              `${isActive 
-                  ? 'bg-[var(--blue-50)] text-[var(--blue-700)] border-2 border-[var(--blue-500)]' 
-                  : 'bg-transparent hover:text-blue-500 hover:border-2 hover:border-[var(--blue-300)]'
-              } text-start m-0 py-3 pl-5 pr-1 rounded-lg`
-            }
-          >Ventas</NavLink>
+      <nav className="flex flex-col gap-1" >
+          <NavLink to="/ventas" className={linkClass}>Ventas</NavLink>
 
-          {user.isAdmin && (
-          <NavLink to="/products" end
-            className={({ isActive }) =>
-              `${isActive 
-                  ? 'bg-[var(--blue-50)] text-[var(--blue-700)] border-2 border-[var(--blue-500)]' 
-                  : 'bg-transparent hover:text-blue-500 hover:border-2 hover:border-[var(--blue-300)]'
-              } text-start m-0 py-3 pl-5 pr-1 rounded-lg`
-            }
-          >Productos</NavLink>)}
+          {/* Caja: visible para todos (empleados abren/cierran caja) */}
+          <NavLink to="/caja" className={linkClass}>Caja</NavLink>
 
-          {user.isAdmin && (
-          <NavLink to="/categorias"
-            className={({ isActive }) =>
-              `${isActive 
-                  ? 'bg-[var(--blue-50)] text-[var(--blue-700)] border-2 border-[var(--blue-500)]' 
-                  : 'bg-transparent hover:text-blue-500 hover:border-2 hover:border-[var(--blue-300)]'
-              } text-start m-0 py-3 pl-5 pr-1 rounded-lg`
-            }
-          >Categorías</NavLink>)}
+          {user.isAdmin && (<NavLink to="/products" end className={linkClass}>Productos</NavLink>)}
 
-          
-          {user.isAdmin && (
-          <NavLink to="/caja"
-            className={({ isActive }) =>
-              `${isActive 
-                  ? 'bg-[var(--blue-50)] text-[var(--blue-700)] border-2 border-[var(--blue-500)]' 
-                  : 'bg-transparent hover:text-blue-500 hover:border-2 hover:border-[var(--blue-300)]'
-              } text-start m-0 py-3 pl-5 pr-1 rounded-lg`
-            }
-        >Movimientos de caja</NavLink>)}
+          {user.isAdmin && (<NavLink to="/categorias" className={linkClass}>Categorías</NavLink>)}
 
-        {user.isAdmin && (
-        <NavLink to="/gastos"
-          className={({ isActive }) =>
-            `${isActive 
-                ? 'bg-[var(--blue-50)] text-[var(--blue-700)] border-2 border-[var(--blue-500)]' 
-                : 'bg-transparent hover:text-blue-500 hover:border-2 hover:border-[var(--blue-300)]'
-            } text-start justify-center m-0 py-3 pl-5  rounded-lg`
-          }
-        >Gastos</NavLink>)}
+          {user.isAdmin && (<NavLink to="/gastos" className={linkClass}>Gastos</NavLink>)}
 
-        {user.isAdmin && (
-        <NavLink to="/config"
-          className={({ isActive }) =>
-              `${isActive 
-                  ? 'bg-[var(--blue-50)] text-[var(--blue-700)] border-2 border-[var(--blue-500)]' 
-                  : 'bg-transparent hover:text-blue-500 hover:border-2 hover:border-[var(--blue-300)]'
-              } text-start m-0 py-3 pl-5 pr-1 rounded-lg`
-            }
-        >
-          Configuración
-        </NavLink>)}
-
+          {user.isAdmin && (<NavLink to="/config" className={linkClass}>Configuración</NavLink>)}
       </nav>
     </div>
   )

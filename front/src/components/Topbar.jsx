@@ -1,38 +1,35 @@
 import { useEffect,useState } from "react";
+import { LogOut } from "lucide-react";
+
 export default function Topbar({ userName = 'usuario', onLogout }) {
-  const [now, setNow] = useState(new Date().toLocaleTimeString())
-  const [day, setDay] = useState(new Date().getUTCDay())
-  const [month, setMonth] = useState(new Date().getUTCMonth())
-  const [year, setYear] = useState(new Date().getUTCFullYear())
+  const [now, setNow] = useState(new Date())
   
   // opcional: avisá si no vino la prop
   if (typeof onLogout !== 'function') {
     console.warn('Topbar: onLogout no fue provisto');
   }
-      useEffect(() => {
-        const interval = setInterval(() => {
-          let date = new Date()
-          setDay(date.getUTCDay())
-          setNow(date.toLocaleTimeString())
 
-          setNow(new Date().toLocaleTimeString())
-        }, 1000)
-      }, [])
+  // reloj: actualiza la hora cada segundo y limpia el intervalo al desmontar
+  useEffect(() => {
+    const interval = setInterval(() => setNow(new Date()), 1000)
+    return () => clearInterval(interval)
+  }, [])
 
+  const hora = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false })
+  const fecha = now.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })
 
      return(
-        <div style={{
-      height:'100%', display:'flex', alignItems:'center',
-      justifyContent:'space-between', padding:'0 16px', width: "100%"
-    }}>
-      {/* Breadcrumb / título contextual (simple por ahora) */}
-      <div style={{ color:'var(--muted)' }}>Panel</div>
+    <div className="h-full w-full flex items-center justify-between px-6">
+      {/* Fecha a la izquierda */}
+      <div className="text-slate-500 capitalize">{fecha}</div>
 
-      {/* Acciones a la derecha */}
-      <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-        <span style={{ color:'var(--muted)' }}>{now.split(':')[0]}:{now.split(':')[1]}</span>
-        Hola {userName}
-        <div className="btn" onClick={onLogout}>Salir</div>
+      {/* Hora, usuario y salir a la derecha */}
+      <div className="flex items-center gap-4">
+        <span className="text-surf-700 font-bold tabular-nums">{hora}</span>
+        <span className="text-slate-700">Hola, <strong>{userName}</strong></span>
+        <button className="btn-secundario flex items-center gap-2 py-1.5" onClick={onLogout}>
+          <LogOut size={16} /> Salir
+        </button>
       </div>
     </div>
      )

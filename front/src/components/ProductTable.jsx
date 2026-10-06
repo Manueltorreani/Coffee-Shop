@@ -1,8 +1,8 @@
 //tabla simple de productos
 export default function ProductTable({items, onEdit, onDelete}){
-    //si no hay datos mostramos un mensaje amigable 
+    //si no hay datos mostramos un mensaje amigable
     if (!items || items.length === 0){
-        return <p> No hay productos para mostrar</p>
+        return <p className="text-slate-500"> No hay productos para mostrar</p>
     }
 
     return (
@@ -22,38 +22,39 @@ export default function ProductTable({items, onEdit, onDelete}){
                         <td  style ={{textAlign: 'right'}}>${p.precio}</td>
                     </tr>
                 ))}
-             </tbody>   
+             </tbody>
         </table>*/
-      <div className="bg-white shadow rounded-lg overflow-hidden flex flex-col justify-center items-center">
-        <table className="w-full text-left py-2 px-4 justify-center"  border="1"  style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead className="h-12">
-          <tr style={{ background: "#eee" }}>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Categoria</th>
-            <th>Precio</th>
-            <th>Acciones</th>
+      <div className="tabla-card">
+        <table className="w-full text-sm text-left">
+        <thead className="tabla-head">
+          <tr>
+            <th className="px-4 py-3">ID</th>
+            <th className="px-4 py-3">Nombre</th>
+            <th className="px-4 py-3">Categoria</th>
+            <th className="px-4 py-3 text-right">Precio</th>
+            <th className="px-4 py-3 text-right">Acciones</th>
           </tr>
         </thead>
         <tbody>
-          {items.length === 0 ? (
-            <tr>
-              <td colSpan="4" style={{ textAlign: "center" }}>No hay productos</td>
-            </tr>
-          ) : (
-            items.map((p) => (
-              <tr key={p.id}>
-                <td>{p.id}</td>
-                <td>{p.nombre}</td>
-                <td>{p.category.nombre}</td>
-                <td>${p.precio}</td>
-                <td>
-                  <button onClick={() => onEdit(p)}><span className="text-blue-600 hover:underline">✏️ Editar</span></button>
-                  <button onClick={() => onDelete(p.id)}><span className="text-red-600 hover:underline">🗑️ Borrar</span></button>
+          {items.map((p) => (
+              <tr key={p.id} className="border-t border-gray-100 hover:bg-gray-50 transition-colors">
+                <td className="px-4 py-3 text-gray-400">{p.id}</td>
+                <td className="px-4 py-3 font-medium text-gray-800">{p.nombre}</td>
+                <td className="px-4 py-3">
+                  {/* badge de categoría con los colores de la marca */}
+                  <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-surf-50 text-surf-700">
+                    {p.category?.nombre || 'Sin categoría'}
+                  </span>
+                </td>
+                <td className="px-4 py-3 text-right font-semibold">${p.precio}</td>
+                <td className="px-4 py-3">
+                  <div className="flex justify-end gap-3">
+                    <button onClick={() => onEdit(p)} className="text-surf-600 hover:text-surf-800 font-medium">✏️ Editar</button>
+                    <button onClick={() => onDelete(p.id)} className="text-red-600 hover:text-red-800 font-medium">🗑️ Borrar</button>
+                  </div>
                 </td>
               </tr>
-            ))
-          )}
+          ))}
         </tbody>
       </table>
     </div>

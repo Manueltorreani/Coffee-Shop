@@ -64,7 +64,7 @@ export default function CategoriesPage() {
 
   return (
     <div className="max-w-4xl mx-auto p-6 flex flex-col gap-6">
-      <h1 className="text-2xl font-bold">Gestión de Categorías</h1>
+      <h1 className="text-2xl font-bold text-surf-800">Gestión de Categorías</h1>
 
       {/* Formulario */}
       <CategoryForm 
@@ -80,9 +80,9 @@ export default function CategoriesPage() {
       {loading && <p>Cargando...</p>}
 
       {/* Tabla de Resultados */}
-      <div className="bg-white shadow rounded-lg overflow-hidden">
+      <div className="tabla-card">
         <table className="w-full text-left">
-          <thead className="bg-gray-50">
+          <thead className="tabla-head">
             <tr>
               <th className="p-4">Nombre</th>
               <th className="p-4 text-right">Acciones</th>
@@ -95,7 +95,7 @@ export default function CategoriesPage() {
                 <td className="p-4 text-right flex justify-end gap-2">
                   <button
                     onClick={() => setEditingCategory(cat)}
-                    className="text-blue-600 hover:underline"
+                    className="text-surf-600 hover:text-surf-800 font-medium"
                   >
                     ✏️ Editar
                   </button>
