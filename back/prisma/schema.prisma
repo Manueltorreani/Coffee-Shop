@@ -15,6 +15,11 @@ model User {
   isAdmin  Boolean  @default(false)
   activo   Boolean  @default(true) // <--- Agregamos este campo para Soft Delete
   orders   Order[]
+  // Caja: un usuario puede abrir/cerrar muchos arqueos y cargar muchos movimientos.
+  // Como User se relaciona DOS veces con ArqueoCaja, cada relación necesita un nombre ("ArqueoApertura"/"ArqueoCierre")
+  arqueosAbiertos  ArqueoCaja[]     @relation("ArqueoApertura")
+  arqueosCerrados  ArqueoCaja[]     @relation("ArqueoCierre")
+  movimientosCaja  MovimientoCaja[]
 }
 
 model Category {
@@ -65,6 +70,7 @@ model Gastos {
   id          Int         @id @default(autoincrement())
   nombre      String
   precio      Float       //historico del precio del gasto
+  paymentMethod String?   // Efectivo, Tarjeta, etc. en texto (igual que Order) -> la caja descuenta solo los de efectivo
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   tipoGastoId Int ? 
@@ -83,4 +89,77 @@ model TipoGasto {
 model PaymentMethod {
   id          Int         @id @default(autoincrement())
   nombre      String      @unique
+}
+
+// CAJA ------------------------------------------------------------
+// Un arqueo es una "sesión" de caja: se abre con un monto inicial y se cierra contando el efectivo.
+// Ventas y gastos NO se relacionan con el arqueo: se toman los que tienen createdAt entre la apertura y el cierre.
+model ArqueoCaja {
+  id                Int       @id @default(autoincrement())
+  fechaApertura     DateTime  @default(now())
+  fechaCierre       DateTime?
+  montoInicial      Float     // efectivo en el cajón al abrir (los otros métodos arrancan en 0)
+  estado            String    @default("ABIERTA") // ABIERTA, CERRADA
+
+  // TOTALES DEL CIERRE (suma de todos los métodos; en null mientras está abierta)
+  // el detalle por método de pago queda en CierreMetodo
+  montoSistema      Float?    // suma de montoSistema de cada método
+  montoUsuario      Float?    // suma de lo contado en cada método
+  diferencia        Float?    // montoUsuario - montoSistema (negativo = falta plata)
+  comentario        String?
+
+  usuarioAperturaId Int
+  usuarioApertura   User      @relation("ArqueoApertura", fields: [usuarioAperturaId], references: [id])
+  usuarioCierreId   Int?
+  usuarioCierre     User?     @relation("ArqueoCierre", fields: [usuarioCierreId], references: [id])
+
+  movimientos       MovimientoCaja[]
+  detalle           CierreMetodo[]
+}
+
+// FOTO DEL CIERRE POR MÉTODO DE PAGO (mismo patrón que Order -> OrderItem)
+// Una fila por cada método (Efectivo, Debito, ...) con su propia fórmula:
+// montoSistema = montoInicial + ventas + ingresos - gastos - egresos
+model CierreMetodo {
+  id           Int        @id @default(autoincrement())
+  metodo       String     // nombre del método en texto (snapshot, igual que Order.paymentMethod)
+  montoInicial Float      @default(0) // solo Efectivo tiene inicial
+  ventas       Float
+  ingresos     Float      // movimientos manuales INGRESO de este método
+  gastos       Float
+  egresos      Float      // movimientos manuales EGRESO de este método
+  montoSistema Float
+  montoUsuario Float      // lo que contó/controló el usuario para este método
+  diferencia   Float      // montoUsuario - montoSistema
+
+  arqueoId     Int
+  arqueo       ArqueoCaja @relation(fields: [arqueoId], references: [id])
+}
+
+// Ingresos/egresos MANUALES (retiros, aportes, ajustes, etc.) de cualquier método de pago
+model MovimientoCaja {
+  id          Int        @id @default(autoincrement())
+  tipo        String     // INGRESO, EGRESO
+  monto       Float      // siempre positivo, el "tipo" dice si suma o resta
+  paymentMethod String   @default("Efectivo") // en texto, igual que Order y Gastos
+  descripcion String
+  createdAt   DateTime   @default(now())
+
+  arqueoId    Int
+  arqueo      ArqueoCaja @relation(fields: [arqueoId], references: [id])
+  userId      Int
+  user        User       @relation(fields: [userId], references: [id])
+}
+
+// Configuración del local: hay UNA sola fila (id = 1), no es un catálogo
+model ConfigLocal {
+  id               Int      @id @default(1)
+  nombre           String   @default("Coffee Shop")
+  direccion        String?
+  telefono         String?
+  cuit             String?
+  mensajeTicket    String?  // texto al pie del ticket (ej: "¡Gracias por su visita!")
+  anchoTicket      Int      @default(80)    // ancho del papel de la impresora en mm (58 u 80)
+  imprimirAlCobrar Boolean  @default(false) // si es true, al cobrar se abre la impresión del ticket
+  updatedAt        DateTime @updatedAt
 }

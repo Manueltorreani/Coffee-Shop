@@ -79,13 +79,10 @@ export default function Router() {
           }
         />
         
+        {/* Caja: empleados también la operan (el historial dentro de la página es solo admin) */}
         <Route
           path="/caja"
-          element={
-            <AdminRoute>
-              <CajaPage />
-            </AdminRoute>
-          }
+          element={<CajaPage />}
         />
         <Route
           path="/gastos"

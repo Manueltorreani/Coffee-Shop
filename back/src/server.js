@@ -10,6 +10,8 @@ import authRouter from './routes/auth.routes.js'
 import productsRouter from './routes/products.routes.js'
 import ordersRouter from './routes/orders.routes.js'
 import gastosRouter from './routes/gastos.routes.js'
+import configRouter from './routes/config.routes.js'
+import cajaRouter from './routes/caja.routes.js'
 
 const app = express()
 const RUTA = process.env.RUTA || "http://localhost"
@@ -28,7 +30,7 @@ app.use(express.json()) // para que lo que yo recibo en el body lo parseo como o
 app.use(
   cors({
     origin: RUTA + ':'+  FRONTEND_PORT, 
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], // PATCH lo usa /orders/:id/status (cobrar/anular)
     allowedHeaders: ['Content-Type', 'Authorization'],
   })
 )
@@ -62,6 +64,8 @@ app.use('/api/auth', authRouter)       // Login y Register, Update, Delete (prot
 app.use('/api/products', productsRouter) // Productos (protegidas las de escritura con JWT)
 app.use('/api/orders', ordersRouter)     // Pedidos (protegidas con JWT)
 app.use('/api/gastos',gastosRouter) // Gastos (protegidas con JWT las CRUD)
+app.use('/api/config', configRouter) // Configuración del local e impresión (escritura solo admin)
+app.use('/api/caja', cajaRouter)     // Arqueos y movimientos de caja (historial solo admin)
 
 // 4.c) Endpoints de ejemplo / utilitarios para testear salud servidor
 app.get('/api/hello', (_req, res) => {
