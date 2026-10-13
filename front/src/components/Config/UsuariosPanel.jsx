@@ -46,6 +46,24 @@ const UsuariosPanel = forwardRef((props,ref) => {
       }
     }
 
+    // Atajo: cambiar el rol (admin <-> empleado) desde la tabla, sin abrir el modal de edición
+    const handleToggleAdmin = async (row) =>{
+      const pregunta = row.isAdmin
+        ? `Quitarle el rol de administrador a ${row.email}?`
+        : `Hacer administrador a ${row.email}?`;
+      if(!window.confirm(pregunta)) return;
+      setIsLoading(true)
+      try {
+        await updateUsuario(row.id, { isAdmin: !row.isAdmin });
+        setError(null)
+        fetchData();
+      } catch (error) {
+        setError(error.message) // ej: no podés quitarte el rol de admin a vos mismo
+      }finally{
+        setIsLoading(false)
+      }
+    }
+
     function handleEditado(){
       setEditando(null);
       fetchData();
@@ -79,9 +97,12 @@ const UsuariosPanel = forwardRef((props,ref) => {
                   <td className="tabla-celda font-medium text-dark">{row.nombre || '-'}</td>
                   <td className="tabla-celda text-texto-suave">{row.email}</td>
                   <td className="tabla-celda">
-                    <span className={`badge ${row.isAdmin ? 'badge-marca' : 'badge-neutro'}`}>
+                    {/* el badge es un botón: click = cambiar el rol */}
+                    <button onClick={() => handleToggleAdmin(row)}
+                      title={row.isAdmin ? "Quitar rol de administrador" : "Hacer administrador"}
+                      className={`badge cursor-pointer hover:brightness-95 transition ${row.isAdmin ? 'badge-marca' : 'badge-neutro'}`}>
                       {row.isAdmin ? "admin" : "empleado"}
-                    </span>
+                    </button>
                   </td>
                   <td className="tabla-celda">
                     <span className={`badge ${row.activo ? 'badge-exito' : 'badge-error'}`}>
