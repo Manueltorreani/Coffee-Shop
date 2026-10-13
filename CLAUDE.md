@@ -24,6 +24,8 @@ Tengo que **defender este proyecto**, así que necesito entender cada línea:
 - **Auto-refresh form ↔ tabla**: la página padre (ej. `GastosPage`) usa `useRef`; el panel/tabla se envuelve en `forwardRef` y expone `refresh` con `useImperativeHandle`; el form llama al refresh tras crear o editar.
 - **Campo `estado`** (boolean activo/inactivo) mostrado como badge en las tablas.
 - **Nombres únicos**: `@unique` en el schema; el error Prisma `P2002` se responde como **HTTP 409** y se muestra inline en el form.
+- **Catálogo dentro de otra pantalla (modal)**: si un catálogo pertenece a otra entidad (ej. `Category` → `Product`), no tiene pantalla propia: se gestiona en un modal desde la pantalla dueña. Ver "Categorías dentro de Productos".
+- **Modal reutilizable**: `ModalModified` (`children`, `onClose`, `titulo` opcional). No crear otro componente de modal.
 
 ## Lecciones aprendidas (no repetir estos errores)
 - Prisma: el nombre del modelo en el controller debe coincidir **exactamente** con el schema (singular vs plural).
@@ -34,12 +36,17 @@ Tengo que **defender este proyecto**, así que necesito entender cada línea:
 - Git: `back/prisma/dev.db` debe estar en `.gitignore`. Después de un pull que cambie `package.json`, correr `npm install` en `back` y `front`.
 - Git: `back/node_modules` también está fuera del repo (`git rm -r --cached`). Después de un pull con migraciones nuevas, correr `npx prisma migrate dev` en `back`.
 - Las rutas que usa el front con `PATCH` necesitan `PATCH` en `methods` del CORS (`server.js`).
+- Prisma: `npx prisma generate` (y el generate de `migrate dev`) falla con `EPERM` si el back está corriendo. Frenar el back, regenerar y volver a levantarlo.
+- Agregar un campo **con `@default`** a un modelo con datos no necesita `migrate reset`: alcanza con `npx prisma migrate dev --name <nombre>`.
+- React: un `<button>` dentro de un `<form>` hace submit por defecto. Usar `type="button"` y renderizar los modales **fuera** del `<form>`.
 
 ## Estado actual
 - ✅ Módulo Gastos: CRUD completo con edición en modal; `Gastos` tiene `paymentMethod` (texto, igual que `Order`).
 - ✅ Módulo Ventas: el usuario sale del token, empleados pueden vender, no se cobra sin método de pago, imprime ticket y comanda.
 - ✅ **Módulo Configuración**: métodos de pago, usuarios (crear/editar/activar, rol), datos del local (`ConfigLocal`, una sola fila) e impresión (`window.print()` + `@media print`, papel 58/80 mm).
 - ✅ **Módulo Caja**: abrir, movimientos manuales, cierre con diferencia, historial (admin).
+- ✅ **Sistema de diseño** Surf Coffee aplicado a todo el front (ver sección al final).
+- ✅ **Categorías dentro de Productos**: modal con listar, crear, editar y activar/desactivar. Ya no existe la pantalla Categorías.
 - ⏳ Después: probar todo de punta a punta en el navegador, preparar la defensa.
 
 ## Roles
@@ -55,6 +62,18 @@ Tengo que **defender este proyecto**, así que necesito entender cada línea:
 - `diferencia = monto contado por el usuario − monto sistema` (negativo = falta plata).
 - `ArqueoCaja`: fechaApertura, fechaCierre, montoInicial, estado (ABIERTA/CERRADA), usuarioApertura/usuarioCierre (dos relaciones con nombre a `User`), y la **foto del cierre**: ventasEfectivo, ingresosManuales, gastosEfectivo, egresosManuales, montoSistema, montoUsuario, diferencia, comentario.
 - Reglas: no puede haber dos cajas abiertas (409), no se registran movimientos sin caja abierta, no se borran movimientos de una caja cerrada.
+
+## Categorías dentro de Productos — implementado
+- `Category`: `nombre` (`@unique`) y `estado` (boolean, default `true`). Migración `category_estado`.
+- **Back** (`products.controller.js`, rutas `/products/cat`): `createCategory` y `updateCategory` hacen `trim()`, aceptan `estado` y responden `P2002` → **409**. En `updateCategory`, `nombre` y `estado` son opcionales (se puede cambiar solo el estado).
+- **Front** (`components/Categorias/`), mismo patrón que TipoGasto:
+  - `CategoriasPanel`: tabla con `forwardRef` + `useImperativeHandle` (expone `fetchData`).
+  - `CategoriasForm`: crear/editar, error 409 inline.
+  - `CategoriasGestion`: contenedor con el `useRef` del panel (hace el rol de `GastosPage`); avisa hacia afuera con `onChange`.
+- **Editar sin modal sobre modal**: el lápiz carga la fila en el mismo form. `CategoriasGestion` le pone `key` al form para que React lo cree de nuevo con esos datos.
+- **El modal vive en `ProductsPage`**. Lo abren dos botones "Categorías": uno siempre visible junto al título y otro junto al select del `ProductForm` (prop `onAbrirCategorias`).
+- **Refresco del select**: `ProductsPage` guarda `categoriasVersion` (número) y lo sube cuando cambian las categorías o se cierra el modal. `ProductForm` lo recibe por prop y lo usa como dependencia del `useEffect` que carga las categorías. También se recarga la tabla de productos.
+- **Categoría inactiva**: no aparece en el select de productos, salvo que el producto en edición ya la tenga. No se borran categorías desde el modal (la ruta `DELETE` existe en el back pero no se usa).
 
 ## Sistema de diseño (marca Surf Coffee)
 Todo vive en **un solo archivo**: `front/src/index.css` (Tailwind v4, sin `tailwind.config.js`). La fuente se carga con un `<link>` en `front/index.html`.
