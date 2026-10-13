@@ -26,6 +26,7 @@ model Category {
   id       Int       @id @default(autoincrement())
   nombre   String    @unique
   products Product[]
+  estado   Boolean   @default(true) // activa/inactiva (igual que TipoGasto)
 }
 
 model Product {

@@ -9,7 +9,9 @@ import { fetchCategories } from "../api/products";
  * - onSave: callback que se dispara al guardar (recibe {nombre, precio})
  * - onCancel: callback para cancelar
  */
-export default function ProductForm ({initialData, onSave, onCancel}){
+// - onAbrirCategorias: callback para abrir el modal de categorías (el modal vive en ProductsPage)
+// - categoriasVersion: número que la página aumenta cuando cambian las categorías -> recargamos el select
+export default function ProductForm ({initialData, onSave, onCancel, onAbrirCategorias, categoriasVersion}){
 
     //estados locales controlados por react
     const[nombre, setNombre] = useState('')
@@ -26,17 +28,31 @@ export default function ProductForm ({initialData, onSave, onCancel}){
         }
     }, [initialData])
 
-    useEffect(() => {
-      const loadCategories = async () => {
-        try {
-          const cats = await fetchCategories()
-          setCategories(cats)
-        } catch (err) {
-          console.error('Error al cargar categorías:', err)
-        }
+    const loadCategories = async () => {
+      try {
+        const cats = await fetchCategories()
+        setCategories(cats)
+      } catch (err) {
+        console.error('Error al cargar categorías:', err)
       }
+    }
+
+    // corre al montar y cada vez que cambia categoriasVersion (o sea, cuando se tocaron categorías en el modal):
+    // así el select se actualiza sin recargar la página
+    useEffect(() => {
       loadCategories()
-    }, [])
+    }, [categoriasVersion])
+
+    // en el select solo van las activas; la del producto que se edita se muestra aunque esté inactiva
+    const categoriasVisibles = categories.filter((cat) => cat.estado || cat.id === initialData?.categoryId)
+
+    // si la categoría elegida no está entre las visibles (ej: se desactivó), elegimos la primera
+    useEffect(() => {
+      if (categoriasVisibles.length > 0 && !categoriasVisibles.some((cat) => cat.id === Number(categoria))) {
+        setCategoria(categoriasVisibles[0].id)
+      }
+    }, [categories, categoria])
+
 
 
     //manejamos el envio del formulario
@@ -77,14 +93,18 @@ export default function ProductForm ({initialData, onSave, onCancel}){
         
         <label className="form-campo w-full">
           Categoria:
-          <select className="form-input" name="categoryId" id="categoryId" value={categoria} onChange={(e) => setCategoria(e.target.value)}>
+          <div className="flex flex-row gap-2">
+            <select className="form-input flex-1" name="categoryId" id="categoryId" value={categoria} onChange={(e) => setCategoria(e.target.value)}>
 
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.nombre}
-              </option>
-            ))}
-          </select>
+              {categoriasVisibles.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.nombre}
+                </option>
+              ))}
+            </select>
+            {/* type="button": si no, al estar dentro del <form> enviaría el producto */}
+            <button className="btn-secundario" type="button" onClick={onAbrirCategorias}>Categorías</button>
+          </div>
         </label>
 
         <div className="flex flex-row justify-between w-full" style={{ display: 'flex', gap: 8 }}>

@@ -7,6 +7,8 @@ import Pagination from "../components/Pagination";
 import { createProduct, updateProduct, deleteProduct } from "../api/products";
 import ProductForm from "../components/ProductForm";
 import { fetchCategories } from "../api/products";
+import ModalModified from "../components/ModalModified";
+import CategoriasGestion from "../components/Categorias/CategoriasGestion";
 
 export default function ProductsPage(){
     //estado de filtros y orden
@@ -16,6 +18,8 @@ export default function ProductsPage(){
     const [sortBy, setSortBy] = useState('id') //campo de orden
     const [sortOrder, setSortOrder] = useState('asc')
     const [editing, setEditing] = useState(null)
+    const [mostrarCategorias, setMostrarCategorias] = useState(false) // true = modal de categorías abierto
+    const [categoriasVersion, setCategoriasVersion] = useState(0) // sube cada vez que cambian las categorías (avisa al ProductForm)
 
 
     //estado de datos y UI
@@ -76,12 +80,35 @@ export default function ProductsPage(){
         setPage(1) 
     }
 
+    // se llama cuando el modal crea o edita una categoría, y también al cerrarlo
+    const handleCategoriasChange = () => {
+        setCategoriasVersion((v) => v + 1) // el ProductForm (si está abierto) recarga su select
+        load() // la tabla muestra el nombre de la categoría: la recargamos por si cambió
+    }
+
+    const cerrarCategorias = () => {
+        setMostrarCategorias(false)
+        handleCategoriasChange()
+    }
+
     //cuando el usuario pulsa anterior/siguiente
     const handlePageChange = (p) => setPage(p)
 
      return (
     <div className="w-full gap-5 flex flex-col" style={{margin: '40px auto', padding: '0 12px'}}>
-      <h1 className="titulo-pagina">Productos</h1>
+      {/* Encabezado: título + botón Categorías, siempre visible */}
+      <div className="flex flex-row items-center justify-between gap-3">
+        <h1 className="titulo-pagina">Productos</h1>
+        <button className="btn-secundario" onClick={() => setMostrarCategorias(true)}>Categorías</button>
+      </div>
+
+      {/* Modal de categorías: vive en la página, fuera del <form> de productos */}
+      {mostrarCategorias && (
+        <ModalModified titulo="Categorías" onClose={cerrarCategorias}>
+          <CategoriasGestion onChange={handleCategoriasChange} />
+        </ModalModified>
+      )}
+
       {editing ? (
       <div className="p-4 rounded-2xl bg-primary-suave border border-borde flex flex-col gap-3">
         <h2 className="font-medium text-dark">{editing.id ? 'Editando producto: ' + editing.nombre : 'Creando nuevo producto'}</h2>
@@ -97,6 +124,8 @@ export default function ProductsPage(){
             load() // recargar lista
           }}
           onCancel={() => setEditing(null)}
+          onAbrirCategorias={() => setMostrarCategorias(true)}
+          categoriasVersion={categoriasVersion}
         />
       </div>
       ) : (

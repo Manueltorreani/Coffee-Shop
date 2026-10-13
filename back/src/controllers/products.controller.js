@@ -115,14 +115,21 @@ export const deleteProduct = async (req, res) => {
 
 
 export const createCategory = async (req, res) => {
-    const { nombre } = req.body
-    if (!nombre || typeof nombre !== 'string') {
+    const { nombre, estado } = req.body
+    if (!nombre || typeof nombre !== 'string' || !nombre.trim()) {
         return res.status(400).json({ error: 'nombre requerido (string)' })
     }
     try {
-        const nueva = await prisma.category.create({ data: { nombre } })
+        const nueva = await prisma.category.create({
+            data: {
+                nombre: nombre.trim(),
+                estado: typeof estado === 'boolean' ? estado : true // si no viene, nace activa
+            }
+        })
         res.status(201).json(nueva)
     } catch (err) {
+        // P2002 = se violó el @unique de nombre -> 409 (conflicto), igual que TipoGasto
+        if (err.code === 'P2002') return res.status(409).json({ error: 'Ya existe una categoría con ese nombre' })
         console.error('ERROR createCategory ->', err)
         res.status(500).json({ error: 'Error interno del servidor' })
     }
@@ -143,15 +150,27 @@ export const deleteCategory = async (req, res) => {
 
 export const updateCategory = async (req, res) => {
     const id = Number(req.params.id)
-    const { nombre } = req.body
+    const { nombre, estado } = req.body
     if (Number.isNaN(id)) return res.status(400).json({ error: "ID inválido" })
-    if (!nombre || typeof nombre !== 'string') return res.status(400).json({ error: 'nombre requerido (string)' })
+
+    // nombre y estado son opcionales: solo se actualiza lo que viene (permite cambiar solo el estado)
+    const data = {}
+    if (nombre !== undefined) {
+        if (typeof nombre !== 'string' || !nombre.trim()) return res.status(400).json({ error: 'nombre requerido (string)' })
+        data.nombre = nombre.trim()
+    }
+    if (estado !== undefined) {
+        if (typeof estado !== 'boolean') return res.status(400).json({ error: 'estado inválido' })
+        data.estado = estado
+    }
     try {
-        const updated = await prisma.category.update({ where: { id }, data: { nombre } })
+        const updated = await prisma.category.update({ where: { id }, data })
         res.json(updated)
     }
         catch (err) {
         if (err.code === 'P2025') return res.status(404).json({ error: "Categoría no encontrada" })
+        // al editar también puede chocar con un nombre existente
+        if (err.code === 'P2002') return res.status(409).json({ error: 'Ya existe una categoría con ese nombre' })
         console.error('ERROR updateCategory ->', err)
         res.status(500).json({ error: 'Error interno del servidor' })
     }

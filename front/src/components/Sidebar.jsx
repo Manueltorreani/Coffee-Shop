@@ -31,8 +31,6 @@ import Logo from '../assets/img/Chupete blanco.png'
 
           {user.isAdmin && (<NavLink to="/products" end className={linkClass}>Productos</NavLink>)}
 
-          {user.isAdmin && (<NavLink to="/categorias" className={linkClass}>Categorías</NavLink>)}
-
           {user.isAdmin && (<NavLink to="/gastos" className={linkClass}>Gastos</NavLink>)}
 
           {user.isAdmin && (<NavLink to="/config" className={linkClass}>Configuración</NavLink>)}

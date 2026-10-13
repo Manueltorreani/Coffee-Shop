@@ -8,7 +8,6 @@ import VentasPage from './pages/VentasPage.jsx'
 import CajaPage from './pages/CajaPage.jsx'
 import GastosPage from './pages/GastosPage.jsx'
 import ConfigPage from './pages/ConfigPage.jsx'
-import CategoriasPage from './pages/CategoriasPage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
 
 import { useAuth } from './context/AuthContext.jsx'
@@ -67,14 +66,6 @@ export default function Router() {
           element={
             <AdminRoute>
               <ProductsPage />
-            </AdminRoute>
-          }
-        />
-        <Route
-          path="/categorias"
-          element={
-            <AdminRoute>
-              <CategoriasPage />
             </AdminRoute>
           }
         />
