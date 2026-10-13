@@ -143,6 +143,14 @@ export const updateOrder = async (req, res) => {
 
   if (req.body.status !== undefined) {
     data.status = req.body.status; // 'PENDING', 'COMPLETED', 'CANCELED'
+
+    // Hora de cierre: se guarda en el momento de cobrar o cancelar.
+    // (updatedAt no sirve para esto: cambia con cualquier modificación posterior de la orden)
+    if (data.status === 'COMPLETED' || data.status === 'CANCELED') {
+      data.closedAt = new Date();
+    } else if (data.status === 'PENDING') {
+      data.closedAt = null; // si se reabre, deja de estar cerrada
+    }
   }
 
   if (req.body.client !== undefined) {

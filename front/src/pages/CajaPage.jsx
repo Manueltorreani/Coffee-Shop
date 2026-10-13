@@ -3,6 +3,7 @@ import MovimientoForm from "../components/Caja/MovimientoForm";
 import CerrarCajaForm from "../components/Caja/CerrarCajaForm";
 import CajaResumen from "../components/Caja/CajaResumen";
 import ArqueosPanel from "../components/Caja/ArqueosPanel";
+import VentasPanel from "../components/Caja/VentasPanel";
 import { getCajaActual } from "../services/fetch/caja";
 import { useAuth } from "../context/AuthContext.jsx";
 import ModalLoading from "../components/ModalLoading";
@@ -50,14 +51,23 @@ export default function CajaPage(){
   return (
     <div className="flex flex-col w-full h-full p-4 gap-4 justify-start items-start z-10 ">
      { isLoading && <ModalLoading/>}
+     {/* Pestañas: Ventas y Arqueos son solo admin; Movimientos de caja la usan todos */}
      <div className="tabs">
+      {user?.isAdmin && (
+        <button className={`tab ${paginaActual === "ventas" ? "tab-activo" : ""}`}
+        onClick={()=>{setPaginaActual("ventas")}}
+        >Ventas</button>
+      )}
       <button className={`tab ${paginaActual === "actual" ? "tab-activo" : ""}`}
       onClick={()=>{setPaginaActual("actual")}}
-      >Caja actual</button>
+      >Movimientos de caja
+        {/* badge "Abierto" solo si hay una caja abierta */}
+        {caja && <span className="badge badge-exito ml-2">Abierto</span>}
+      </button>
       {user?.isAdmin && (
         <button className={`tab ${paginaActual === "historial" ? "tab-activo" : ""}`}
         onClick={()=>{setPaginaActual("historial")}}
-        >Historial de arqueos</button>
+        >Arqueos</button>
       )}
       </div>
 
@@ -79,6 +89,7 @@ export default function CajaPage(){
         </div>
       )}
       { (paginaActual === "historial") && <ArqueosPanel ref={arqueosPanelRef}/> }
+      { (paginaActual === "ventas") && user?.isAdmin && <VentasPanel/> }
       </div>
     </div>
   )

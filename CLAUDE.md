@@ -45,13 +45,14 @@ Tengo que **defender este proyecto**, así que necesito entender cada línea:
 - ✅ Módulo Ventas: el usuario sale del token, empleados pueden vender, no se cobra sin método de pago, imprime ticket y comanda.
 - ✅ **Módulo Configuración**: métodos de pago, usuarios (crear/editar/activar, rol), datos del local (`ConfigLocal`, una sola fila) e impresión (`window.print()` + `@media print`, papel 58/80 mm).
 - ✅ **Módulo Caja**: abrir, movimientos manuales, cierre con diferencia, historial (admin).
+- ✅ **Ventas por período en Caja** (solo admin): pestaña Ventas con filtro Diario/Mensual/Anual, resumen y tabla.
 - ✅ **Sistema de diseño** Surf Coffee aplicado a todo el front (ver sección al final).
 - ✅ **Categorías dentro de Productos**: modal con listar, crear, editar y activar/desactivar. Ya no existe la pantalla Categorías.
 - ⏳ Después: probar todo de punta a punta en el navegador, preparar la defensa.
 
 ## Roles
 - Empleado (no admin): Ventas y Caja (abrir, movimientos, cerrar).
-- Admin: todo, más productos, categorías, gastos, configuración e historial de arqueos.
+- Admin: todo, más productos, categorías, gastos, configuración, historial de arqueos y ventas por período.
 
 ## Diseño del módulo Caja (estilo Fudo) — implementado
 - **Dos modelos**: `ArqueoCaja` (sesión de apertura → cierre) y `MovimientoCaja` (detalle).
@@ -62,6 +63,16 @@ Tengo que **defender este proyecto**, así que necesito entender cada línea:
 - `diferencia = monto contado por el usuario − monto sistema` (negativo = falta plata).
 - `ArqueoCaja`: fechaApertura, fechaCierre, montoInicial, estado (ABIERTA/CERRADA), usuarioApertura/usuarioCierre (dos relaciones con nombre a `User`), y la **foto del cierre**: ventasEfectivo, ingresosManuales, gastosEfectivo, egresosManuales, montoSistema, montoUsuario, diferencia, comentario.
 - Reglas: no puede haber dos cajas abiertas (409), no se registran movimientos sin caja abierta, no se borran movimientos de una caja cerrada.
+
+## Ventas por período en Caja — implementado
+- **Pestañas de Caja**: Ventas (admin) | Movimientos de caja (todos, con badge "Abierto" si hay caja abierta) | Arqueos (admin). La pestaña por defecto es Movimientos de caja.
+- No hay modelo `Venta`: las ventas son `Order`. Se agregó `closedAt DateTime?` (migración `order_closed_at`): `updateOrder` lo guarda al pasar a `COMPLETED` o `CANCELED` y lo vuelve a `null` si vuelve a `PENDING`. No se usa `updatedAt` porque cambia con cualquier modificación. Las órdenes anteriores a la migración tienen `closedAt` en null (la tabla muestra "-").
+- **Helper** `back/src/utils/rangoFechas.js`: `rangoPorPeriodo(periodo, fecha)` devuelve `{ desde, hasta }` en hora de Argentina (UTC-3) o `null` si es inválido; `filtroRango(rango)` arma el filtro de Prisma. El rango es **[desde, hasta)**: `gte` desde, `lt` hasta (hasta = inicio del período siguiente).
+- **Endpoint** `GET /api/caja/ventas?periodo=diario|mensual|anual&fecha=YYYY-MM-DD` (solo admin), en `caja.controller.js` → `getVentasResumen`. Devuelve `{ periodo, desde, hasta, resumen: { cantidad, promedio, total }, ventas }`.
+- El resumen usa `prisma.order.aggregate` (`_count`, `_sum`, `_avg`) y cuenta **solo `COMPLETED`**. La tabla lista **todas** las órdenes del período con su estado.
+- **Front**: `components/Caja/VentasPanel.jsx`. Selector de fecha con `react-datepicker` (modo día, mes o año). Se recarga con un `useEffect` que depende de `[periodo, fecha]`; usa una variable `vigente` para descartar respuestas viejas si el filtro cambia rápido.
+- **Detalle de una venta**: click en una fila despliega debajo sus productos (mismo patrón `Fragment` + fila de detalle que `ArqueosPanel`). Los ítems no vienen en el listado: se piden al abrir la fila con `GET /api/caja/ventas/:id` (solo admin) → `getVentaDetalle`, que devuelve la orden con `items` y `user` (con `select`, sin la contraseña).
+- El arqueo (`calcularResumen`) **no** usa este helper: su rango es apertura → cierre, no un período.
 
 ## Categorías dentro de Productos — implementado
 - `Category`: `nombre` (`@unique`) y `estado` (boolean, default `true`). Migración `category_estado`.

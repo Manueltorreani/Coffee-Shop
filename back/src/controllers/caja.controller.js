@@ -1,4 +1,5 @@
 import { prisma } from '../lib/prisma.js'
+import { rangoPorPeriodo, filtroRango } from '../utils/rangoFechas.js'
 
 // ==========================================
 // HELPERS
@@ -278,6 +279,87 @@ export const deleteMovimiento = async (req, res) => {
     return res.status(200).json(movimiento)
   } catch (err) {
     console.error("error eliminando movimiento : ", err)
+    res.status(500).json({ error: "error interno del servidor" })
+  }
+}
+
+// ==========================================
+// VENTAS POR PERÍODO (pestaña Ventas de Caja, solo admin)
+// ==========================================
+
+// GET /api/caja/ventas?periodo=diario|mensual|anual&fecha=YYYY-MM-DD
+// Devuelve el rango de fechas, el resumen (cantidad, promedio, total) y la lista de ventas del período.
+export const getVentasResumen = async (req, res) => {
+  try {
+    const { periodo = 'diario', fecha } = req.query
+
+    const rango = rangoPorPeriodo(periodo, fecha)
+    if (!rango) {
+      return res.status(400).json({ error: "Período o fecha inválidos (periodo: diario|mensual|anual, fecha: YYYY-MM-DD)" })
+    }
+
+    const createdAt = filtroRango(rango)
+
+    // Las dos consultas son independientes -> las lanzamos juntas con Promise.all
+    const [totales, ventas] = await Promise.all([
+      // aggregate: la base cuenta, suma y promedia (no traemos las filas para calcular en JS).
+      // Solo COMPLETED: es la plata que realmente entró.
+      prisma.order.aggregate({
+        where: { status: 'COMPLETED', createdAt },
+        _count: { id: true },
+        _sum: { total: true },
+        _avg: { total: true },
+      }),
+      // La tabla muestra TODAS las ventas del período (pendientes y canceladas también)
+      prisma.order.findMany({
+        where: { createdAt },
+        orderBy: { createdAt: 'desc' },
+        select: { id: true, client: true, createdAt: true, closedAt: true, status: true, paymentMethod: true, total: true },
+      }),
+    ])
+
+    return res.status(200).json({
+      periodo,
+      desde: rango.desde,
+      hasta: rango.hasta,
+      resumen: {
+        cantidad: totales._count.id,
+        promedio: totales._avg.total ?? 0, // si no hay ventas, _avg y _sum vienen en null
+        total: totales._sum.total ?? 0,
+      },
+      ventas,
+    })
+  } catch (err) {
+    console.error("error obteniendo ventas por período : ", err)
+    res.status(500).json({ error: "error interno del servidor" })
+  }
+}
+
+// GET /api/caja/ventas/:id
+// Detalle de UNA venta: la orden con sus productos (OrderItem) y el usuario que la cargó.
+// Se pide recién al hacer click en la fila, así el listado por período no viaja con todos los ítems.
+export const getVentaDetalle = async (req, res) => {
+  try {
+    const id = Number(req.params.id)
+    if (Number.isNaN(id)) {
+      return res.status(400).json({ error: "id inválido" })
+    }
+
+    const venta = await prisma.order.findUnique({
+      where: { id },
+      include: {
+        items: true, // nombre, cantidad y precio guardados como eran al momento de vender (snapshot)
+        user: { select: { id: true, nombre: true, email: true } }, // select: no mandamos la contraseña
+      },
+    })
+
+    if (!venta) {
+      return res.status(404).json({ error: "Venta no encontrada" })
+    }
+
+    return res.status(200).json(venta)
+  } catch (err) {
+    console.error("error obteniendo detalle de venta : ", err)
     res.status(500).json({ error: "error interno del servidor" })
   }
 }

@@ -51,6 +51,7 @@ model Order {
   paymentMethod String?     // Efectivo, Tarjeta, etc.
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
+  closedAt    DateTime?   // hora de cierre: se guarda al cobrar (COMPLETED) o cancelar (CANCELED). null = pendiente
   items       OrderItem[]
 }
 

@@ -44,3 +44,16 @@ export const deleteMovimiento = (id) => {
     method: "DELETE",
   });
 };
+
+// VENTAS POR PERÍODO ------------------------------------------
+
+// GET -> ventas de un período con su resumen (solo admin)
+// periodo: "diario" | "mensual" | "anual" · fecha: "YYYY-MM-DD" (un día que cae dentro del período)
+export const getVentasResumen = (periodo, fecha) => {
+  return apiFetch(`/caja/ventas?periodo=${periodo}&fecha=${fecha}`);
+};
+
+// GET -> detalle de una venta: la orden con sus productos y el usuario que la cargó (solo admin)
+export const getVentaDetalle = (id) => {
+  return apiFetch(`/caja/ventas/${id}`);
+};
