@@ -63,35 +63,35 @@ const GastosPanel = forwardRef ((props, ref) => {
           <table className="w-full text-sm">
             <thead>
               <tr className="tabla-head">
-                <th className="px-4 py-3 text-left w-[30px]">#</th>
-                <th className="px-4 py-3 text-left">Fecha</th>
-                <th className="px-4 py-3 text-left">Categoria</th>
-                <th className="px-4 py-3 text-left">Nombre</th>
-                <th className="px-4 py-3 text-left">Pago</th>
-                <th className="px-4 py-3 text-left w-[70px]">Importe</th>
-                <th className="px-4 py-3 text-left w-[70px]">Accion</th>
+                <th className="tabla-celda text-left w-[30px]">#</th>
+                <th className="tabla-celda text-left">Fecha</th>
+                <th className="tabla-celda text-left">Categoria</th>
+                <th className="tabla-celda text-left">Nombre</th>
+                <th className="tabla-celda text-left">Pago</th>
+                <th className="tabla-celda text-left w-[70px]">Importe</th>
+                <th className="tabla-celda text-left w-[70px]">Accion</th>
               </tr>
             </thead>
             <tbody>
               {gastos.map((row) => (
                 <tr
                   key={row.id}
-                  className="border-t border-gray-100 hover:bg-gray-50 transition-colors"
+                  className="tabla-fila"
                 >
-                  <td className="px-4 py-3 text-gray-400">{row.id}</td>
-                  <td className="px-4 py-3 text-gray-500">{new Date(row.createdAt).toLocaleDateString('es-AR')}</td>
-                  <td className="px-4 py-3 font-medium text-gray-800">{row.tipoGastos?.nombre}</td>
-                  <td className="px-4 py-3 font-medium text-gray-800">{row.nombre}</td>
-                  <td className="px-4 py-3 text-gray-500">{row.paymentMethod || '-'}</td>
-                  <td className="px-4 py-3 font-medium text-gray-800">${row.precio}</td>
+                  <td className="tabla-celda text-texto-suave/70">{row.id}</td>
+                  <td className="tabla-celda text-texto-suave">{new Date(row.createdAt).toLocaleDateString('es-AR')}</td>
+                  <td className="tabla-celda font-medium text-dark">{row.tipoGastos?.nombre}</td>
+                  <td className="tabla-celda font-medium text-dark">{row.nombre}</td>
+                  <td className="tabla-celda text-texto-suave">{row.paymentMethod || '-'}</td>
+                  <td className="tabla-celda font-medium text-dark">${row.precio}</td>
                   <td className="px-3 py-2 flex flex-row gap-2">
                     <button
                       onClick={() => handleDelete(row.id)}
-                      className="text-gray-400 hover:text-red-500 transition-colors"
+                      className="btn-icono btn-icono-borrar"
                     >
                       <Trash2 size={15} />
                     </button>
-                    <button className="text-gray-400 hover:text-amber-500 transition-colors"
+                    <button className="btn-icono btn-icono-editar"
                       onClick={() => setEditando(row)}
                     >
                       <SquarePen size={15} />

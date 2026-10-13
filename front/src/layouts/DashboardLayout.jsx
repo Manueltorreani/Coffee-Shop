@@ -32,7 +32,7 @@ export default function DashboardLayout() {
       {/* Sidebar */}
       <aside
         style={{ width: 240, minWidth: 240 }}
-        className="bg-surf-600" // azul exacto del logo
+        className="bg-nav" // color nav de la marca
       >
         <Sidebar />
       </aside>
@@ -42,8 +42,8 @@ export default function DashboardLayout() {
           style={{
             width: '100%',
             height: 60,
-            borderBottom: `1px solid var(--border)`,
-            background: '#fff',
+            borderBottom: `1px solid var(--color-borde)`,
+            background: 'var(--color-nav)',
           }}
         >
           <Topbar userName={user?.nombre || 'usuario'} onLogout={handleLogout} />
@@ -59,7 +59,7 @@ export default function DashboardLayout() {
             padding: '20px',
             overflow: 'auto',
           }}
-          className="bg-surf-50" // fondo celeste muy suave de la paleta
+          className="bg-fondo" // fondo neutro de la app
         >
           {/* CONTENEDOR BLANCO*/}
           <div 
@@ -67,7 +67,7 @@ export default function DashboardLayout() {
             style={{
               position: 'relative',
               flex: 1,
-              backgroundColor: '#ffffff',
+              backgroundColor: 'var(--color-superficie)',
               padding: '20px',
               borderRadius: '16px',
             }}

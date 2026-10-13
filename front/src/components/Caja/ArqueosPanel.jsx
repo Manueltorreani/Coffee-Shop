@@ -10,7 +10,7 @@ const formatoFecha = (fecha) => fecha ? new Date(fecha).toLocaleString('es-AR', 
 
 const plata = (valor) => valor === null || valor === undefined ? '-' : `$${valor.toFixed(2)}`;
 
-const colorDiferencia = (dif) => dif < 0 ? 'text-red-600' : dif > 0 ? 'text-amber-600' : 'text-green-600';
+const colorDiferencia = (dif) => dif < 0 ? 'text-error' : dif > 0 ? 'text-aviso' : 'text-exito';
 
 // Historial de arqueos (solo admin). Cada fila muestra los TOTALES del cierre;
 // al hacer click se despliega la foto por método de pago (CierreMetodo).
@@ -63,42 +63,42 @@ const ArqueosPanel = forwardRef((props,ref) => {
                 <Fragment key={row.id}>
                   <tr
                     onClick={() => setAbierto(abierto === row.id ? null : row.id)}
-                    className="border-t border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
+                    className="tabla-fila cursor-pointer"
                   >
-                    <td className="px-3 py-3 text-gray-400">
+                    <td className="px-3 py-3 text-texto-suave/70">
                       {row.detalle.length > 0 && (abierto === row.id ? <ChevronDown size={15}/> : <ChevronRight size={15}/>)}
                     </td>
-                    <td className="px-3 py-3 text-gray-400">{row.id}</td>
+                    <td className="px-3 py-3 text-texto-suave/70">{row.id}</td>
                     <td className="px-3 py-3 whitespace-nowrap">
                       {formatoFecha(row.fechaApertura)}
-                      <div className="text-xs text-gray-400">{row.usuarioApertura?.nombre || row.usuarioApertura?.email}</div>
+                      <div className="text-xs text-texto-suave/70">{row.usuarioApertura?.nombre || row.usuarioApertura?.email}</div>
                     </td>
                     <td className="px-3 py-3 whitespace-nowrap">
                       {formatoFecha(row.fechaCierre)}
-                      <div className="text-xs text-gray-400">{row.usuarioCierre?.nombre || row.usuarioCierre?.email}</div>
+                      <div className="text-xs text-texto-suave/70">{row.usuarioCierre?.nombre || row.usuarioCierre?.email}</div>
                     </td>
                     <td className="px-3 py-3 text-right">{plata(row.montoInicial)}</td>
                     <td className="px-3 py-3 text-right font-medium">{plata(row.montoSistema)}</td>
                     <td className="px-3 py-3 text-right font-medium">{plata(row.montoUsuario)}</td>
-                    <td className={`px-3 py-3 text-right font-bold ${colorDiferencia(row.diferencia)}`}>
+                    <td className={`px-3 py-3 text-right font-medium ${colorDiferencia(row.diferencia)}`}>
                       {plata(row.diferencia)}
                     </td>
                     <td className="px-3 py-3">
-                      <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${row.estado === 'ABIERTA' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-700'}`}>
+                      <span className={`badge ${row.estado === 'ABIERTA' ? 'badge-exito' : 'badge-neutro'}`}>
                         {row.estado === 'ABIERTA' ? "abierta" : "cerrada"}
                       </span>
                     </td>
-                    <td className="px-3 py-3 text-gray-500">{row.comentario || '-'}</td>
+                    <td className="px-3 py-3 text-texto-suave">{row.comentario || '-'}</td>
                   </tr>
 
                   {/* DETALLE POR MÉTODO DE PAGO */}
                   {abierto === row.id && (
-                    <tr className="bg-gray-50">
+                    <tr className="bg-fondo">
                       <td></td>
                       <td colSpan={9} className="px-3 py-3">
                         <table className="w-full text-xs">
                           <thead>
-                            <tr className="text-gray-500">
+                            <tr className="text-texto-suave">
                               <th className="px-2 py-1 text-left">Método</th>
                               <th className="px-2 py-1 text-right">Inicial</th>
                               <th className="px-2 py-1 text-right">+ Ventas</th>
@@ -112,7 +112,7 @@ const ArqueosPanel = forwardRef((props,ref) => {
                           </thead>
                           <tbody>
                             {row.detalle.map((m) => (
-                              <tr key={m.id} className="border-t border-gray-200">
+                              <tr key={m.id} className="border-t border-borde">
                                 <td className="px-2 py-1 font-medium">{m.metodo}</td>
                                 <td className="px-2 py-1 text-right">{plata(m.montoInicial)}</td>
                                 <td className="px-2 py-1 text-right">{plata(m.ventas)}</td>
@@ -121,7 +121,7 @@ const ArqueosPanel = forwardRef((props,ref) => {
                                 <td className="px-2 py-1 text-right">{plata(m.egresos)}</td>
                                 <td className="px-2 py-1 text-right font-medium">{plata(m.montoSistema)}</td>
                                 <td className="px-2 py-1 text-right font-medium">{plata(m.montoUsuario)}</td>
-                                <td className={`px-2 py-1 text-right font-bold ${colorDiferencia(m.diferencia)}`}>{plata(m.diferencia)}</td>
+                                <td className={`px-2 py-1 text-right font-medium ${colorDiferencia(m.diferencia)}`}>{plata(m.diferencia)}</td>
                               </tr>
                             ))}
                           </tbody>

@@ -60,40 +60,40 @@ const UsuariosPanel = forwardRef((props,ref) => {
           </ModalModified>
         )}
         <div className="tabla-card w-[560px] max-h-[400px]" >
-          {error && <p className="text-red-500 text-xs px-4 pt-3">{error}</p>}
+          {error && <p className="form-error px-4 pt-3">{error}</p>}
           <table className="w-full text-sm">
             <thead>
               <tr className="tabla-head">
-                <th className="px-4 py-3 text-left w-[30px]">#</th>
-                <th className="px-4 py-3 text-left">Nombre</th>
-                <th className="px-4 py-3 text-left">Email</th>
-                <th className="px-4 py-3 text-left">Rol</th>
-                <th className="px-4 py-3 text-left w-[80px]">Estado</th>
-                <th className="px-4 py-3 text-left w-[70px]">Accion</th>
+                <th className="tabla-celda text-left w-[30px]">#</th>
+                <th className="tabla-celda text-left">Nombre</th>
+                <th className="tabla-celda text-left">Email</th>
+                <th className="tabla-celda text-left">Rol</th>
+                <th className="tabla-celda text-left w-[80px]">Estado</th>
+                <th className="tabla-celda text-left w-[70px]">Accion</th>
               </tr>
             </thead>
             <tbody>
               {usuarios.map((row) => (
-                <tr key={row.id} className="border-t border-gray-100 hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-3 text-gray-400">{row.id}</td>
-                  <td className="px-4 py-3 font-medium text-gray-800">{row.nombre || '-'}</td>
-                  <td className="px-4 py-3 text-gray-600">{row.email}</td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${row.isAdmin ? 'bg-surf-100 text-surf-800' : 'bg-gray-100 text-gray-700'}`}>
+                <tr key={row.id} className="tabla-fila">
+                  <td className="tabla-celda text-texto-suave/70">{row.id}</td>
+                  <td className="tabla-celda font-medium text-dark">{row.nombre || '-'}</td>
+                  <td className="tabla-celda text-texto-suave">{row.email}</td>
+                  <td className="tabla-celda">
+                    <span className={`badge ${row.isAdmin ? 'badge-marca' : 'badge-neutro'}`}>
                       {row.isAdmin ? "admin" : "empleado"}
                     </span>
                   </td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${row.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                  <td className="tabla-celda">
+                    <span className={`badge ${row.activo ? 'badge-exito' : 'badge-error'}`}>
                       {row.activo ? "activo" : "inactivo"}
                     </span>
                   </td>
                   <td className="px-3 py-2 flex flex-row gap-2">
                     <button onClick={() => handleToggleActivo(row)} title={row.activo ? "Desactivar" : "Activar"}
-                      className="text-gray-400 hover:text-red-500 transition-colors">
+                      className="btn-icono btn-icono-borrar">
                       <Power size={15} />
                     </button>
-                    <button onClick={() => setEditando(row)} className="text-gray-400 hover:text-amber-500 transition-colors">
+                    <button onClick={() => setEditando(row)} className="btn-icono btn-icono-editar">
                       <SquarePen size={15} />
                     </button>
                   </td>

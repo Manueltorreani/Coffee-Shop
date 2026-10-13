@@ -21,12 +21,12 @@ export default function Topbar({ userName = 'usuario', onLogout }) {
      return(
     <div className="h-full w-full flex items-center justify-between px-6">
       {/* Fecha a la izquierda */}
-      <div className="text-slate-500 capitalize">{fecha}</div>
+      <div className="text-white/85 capitalize">{fecha}</div>
 
       {/* Hora, usuario y salir a la derecha */}
       <div className="flex items-center gap-4">
-        <span className="text-surf-700 font-bold tabular-nums">{hora}</span>
-        <span className="text-slate-700">Hola, <strong>{userName}</strong></span>
+        <span className="text-white font-medium tabular-nums">{hora}</span>
+        <span className="text-white">Hola, <strong>{userName}</strong></span>
         <button className="btn-secundario flex items-center gap-2 py-1.5" onClick={onLogout}>
           <LogOut size={16} /> Salir
         </button>

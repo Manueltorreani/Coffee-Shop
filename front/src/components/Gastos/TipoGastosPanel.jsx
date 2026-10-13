@@ -64,33 +64,33 @@ import TipoGastosForm from "./TipoGastosForm";
           <table className="w-full text-sm">
             <thead>
               <tr className="tabla-head">
-                <th className="px-4 py-3 text-left w-[30px]">#</th>
-                <th className="px-4 py-3 text-left">Nombre</th>
-                <th className="px-4 py-3 text-left w-[80px]">Estado</th>
-                <th className="px-4 py-3 text-left w-[70px]">Accion</th>
+                <th className="tabla-celda text-left w-[30px]">#</th>
+                <th className="tabla-celda text-left">Nombre</th>
+                <th className="tabla-celda text-left w-[80px]">Estado</th>
+                <th className="tabla-celda text-left w-[70px]">Accion</th>
               </tr>
             </thead>
             <tbody>
               {tipoDeGastos.map((row) => (
                 <tr
                   key={row.id}
-                  className="border-t border-gray-100 hover:bg-gray-50 transition-colors"
+                  className="tabla-fila"
                 >
-                  <td className="px-4 py-3 text-gray-400">{row.id}</td>
-                  <td className="px-4 py-3 font-medium text-gray-800">{row.nombre}</td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${row.estado ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                  <td className="tabla-celda text-texto-suave/70">{row.id}</td>
+                  <td className="tabla-celda font-medium text-dark">{row.nombre}</td>
+                  <td className="tabla-celda">
+                    <span className={`badge ${row.estado ? 'badge-exito' : 'badge-error'}`}>
                       {row.estado ?"activo":"inactivo"}
                     </span>
                   </td>
                   <td className="px-3 py-2 flex flex-row gap-2">
                     <button
                       onClick={() => handleDelete(row.id)}
-                      className="text-gray-400 hover:text-red-500 transition-colors"
+                      className="btn-icono btn-icono-borrar"
                     >
                       <Trash2 size={15} />
                     </button>
-                    <button className="text-gray-400 hover:text-amber-500 transition-colors"
+                    <button className="btn-icono btn-icono-editar"
                       onClick={() => setEditando(row)}
                      >
                       <SquarePen size={15} />

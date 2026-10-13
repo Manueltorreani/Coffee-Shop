@@ -29,12 +29,12 @@ export default function AbrirCajaForm (props){
         { isLoading && <ModalLoading/>}
         <div className="form-card">
             <h3 className="form-titulo">Abrir caja</h3>
-            <p className="text-xs text-gray-500">No hay ninguna caja abierta. Contá el efectivo con el que arrancás.</p>
+            <p className="text-xs text-texto-suave">No hay ninguna caja abierta. Contá el efectivo con el que arrancás.</p>
             <div className="form-campo">Monto inicial
                 <input className="form-input" type="number" min="0" placeholder="0"
                 value={montoInicial}
                 onChange={(e)=>setMontoInicial(e.target.value)}/>
-                {error && <p className="text-red-500 text-xs">{error}</p>}
+                {error && <p className="form-error">{error}</p>}
             </div>
             <button className="btn-primario" onClick={handleAbrir}>
                 Abrir caja

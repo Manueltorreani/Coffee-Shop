@@ -81,10 +81,10 @@ export default function ProductsPage(){
 
      return (
     <div className="w-full gap-5 flex flex-col" style={{margin: '40px auto', padding: '0 12px'}}>
-      <h1 className="text-2xl font-bold text-surf-800">Productos</h1>
+      <h1 className="titulo-pagina">Productos</h1>
       {editing ? (
-      <div className="p-4 rounded-2xl bg-surf-50 border border-surf-100 flex flex-col gap-3">
-        <h2 className="font-bold text-surf-800">{editing.id ? 'Editando producto: ' + editing.nombre : 'Creando nuevo producto'}</h2>
+      <div className="p-4 rounded-2xl bg-primary-suave border border-borde flex flex-col gap-3">
+        <h2 className="font-medium text-dark">{editing.id ? 'Editando producto: ' + editing.nombre : 'Creando nuevo producto'}</h2>
         <ProductForm
           initialData={editing}
           onSave={async (data) => {
@@ -121,7 +121,7 @@ export default function ProductsPage(){
 
       {/* Estados de carga y error */}
       {loading && <p>Cargando...</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <p className="text-error">{error}</p>}
 
       {/* Si no estamos cargando ni en error, mostramos tabla y paginación */}
       {!loading && !error && (
@@ -137,7 +137,7 @@ export default function ProductsPage(){
             }}
           />
           <Pagination page={page} totalPages={meta.totalPages} onPageChange={handlePageChange} />
-          <p style={{ marginTop: 8, color: '#555' }}>
+          <p className="text-texto-suave" style={{ marginTop: 8 }}>
             Total: {meta.total} &middot; Página {page}/{meta.totalPages}
           </p>
         </>

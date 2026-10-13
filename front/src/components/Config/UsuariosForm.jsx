@@ -81,12 +81,12 @@ export default function UsuariosForm (props){
                 value={password}
                 onChange={(e)=>setPassword(e.target.value)}/>
             </div>
-            <div className="flex flex-row gap-2 items-center text-sm font-medium text-slate-600">Administrador
+            <div className="flex flex-row gap-2 items-center text-sm font-medium text-texto-suave">Administrador
                 <input className="w-5 h-5" type="checkbox"
                 checked={isAdmin}
                 onChange={(e)=>setIsAdmin(e.target.checked)}/>
             </div>
-            {error && <p className="text-red-500 text-xs">{error}</p>}
+            {error && <p className="form-error">{error}</p>}
             <button className="btn-primario" onClick={ () => {
                 if(isModified){
                     handleModified();

@@ -77,7 +77,7 @@ export default function MovimientoForm (props){
                 value={descripcion}
                 onChange={(e)=>setDescripcion(e.target.value)}/>
             </div>
-            {error && <p className="text-red-500 text-xs">{error}</p>}
+            {error && <p className="form-error">{error}</p>}
             <button className="btn-primario" onClick={handleCreate}>
                 Registrar
             </button>

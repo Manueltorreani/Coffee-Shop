@@ -63,7 +63,7 @@ export default function CajaPage(){
 
       {/* resultado del último cierre */}
       { (paginaActual === "actual") && ultimoCierre && (
-        <div className={`p-4 rounded-2xl shadow text-black ${ultimoCierre.diferencia < 0 ? 'bg-red-50' : 'bg-green-50'}`}>
+        <div className={`p-4 rounded-2xl shadow text-dark ${ultimoCierre.diferencia < 0 ? 'bg-error-suave' : 'bg-exito-suave'}`}>
           Caja #{ultimoCierre.id} cerrada. Sistema: ${ultimoCierre.montoSistema.toFixed(2)} · Contado: ${ultimoCierre.montoUsuario.toFixed(2)} ·{' '}
           <strong>Diferencia: ${ultimoCierre.diferencia.toFixed(2)}</strong>
         </div>

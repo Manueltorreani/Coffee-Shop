@@ -164,34 +164,34 @@ export default function VentasPage() {
   // --- RENDER ---
   const StatusBadge = ({ status }) => {
     const styles = {
-      PENDING: "bg-yellow-100 text-yellow-800",
-      COMPLETED: "bg-green-100 text-green-800",
-      CANCELED: "bg-red-100 text-red-800"
+      PENDING: "badge-aviso",
+      COMPLETED: "badge-exito",
+      CANCELED: "badge-error"
     };
-    return <span className={`px-2 py-1 rounded-full text-xs font-medium ${styles[status]}`}>{status}</span>;
+    return <span className={`badge ${styles[status]}`}>{status}</span>;
   };
 
   return (
-    <div className="flex flex-col md:flex-row w-full h-screen bg-gray-50 overflow-hidden">
+    <div className="flex flex-col md:flex-row w-full h-screen bg-fondo overflow-hidden">
       {/* Ticket/Comanda: se monta, imprime y se desmonta solo */}
       {impresion && (
         <Ticket orden={impresion.orden} config={config} tipo={impresion.tipo} onAfterPrint={() => setImpresion(null)} />
       )}
 
       {/* COLUMNA IZQUIERDA: LISTADO DE VENTAS */}
-      <div className="w-full md:w-1/3 flex flex-col border-r bg-white">
-        <div className="p-4 border-b space-y-4">
+      <div className="w-full md:w-1/3 flex flex-col border-r border-borde bg-superficie">
+        <div className="p-4 border-b border-borde space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="text-xl font-bold text-gray-800 italic">Ventas</h2>
-            <button onClick={handleCreateOrder} className="bg-surf-600 hover:bg-surf-700 text-white px-3 py-2 rounded-lg flex items-center gap-2 text-sm font-bold transition">
+            <h2 className="text-xl font-medium text-dark italic">Ventas</h2>
+            <button onClick={handleCreateOrder} className="btn-primario flex items-center gap-2 text-sm">
               <Plus size={18} /> Nueva Orden
             </button>
           </div>
           <div>
-            <div className="flex flex-row items-center gap-3 bg-white p-2 rounded-xl border border-gray-200 shadow-sm">
+            <div className="flex flex-row items-center gap-3 bg-superficie p-2 rounded-xl border border-borde shadow-sm">
             {/* Botón Hoy */}
             <button 
-              className='px-3 py-2 text-sm font-semibold rounded-lg bg-surf-50 text-surf-600 hover:bg-surf-100 transition-colors' 
+              className='px-3 py-2 text-sm font-medium rounded-lg bg-primary-suave text-secondary hover:bg-borde transition-colors' 
               onClick={() => setFilterDate(getTodayInUTC3())}
             >
               Hoy
@@ -200,14 +200,14 @@ export default function VentasPage() {
             {/* Contenedor del Input con Icono */}
             <div className="relative flex items-center">
               <Calendar 
-                className="absolute left-3 text-gray-400 pointer-events-none" 
+                className="absolute left-3 text-texto-suave/70 pointer-events-none" 
                 size={18} 
               />
               <input 
                 type="date" 
                 value={filterDate || ""} // Evita el error de "uncontrolled component"
                 onChange={(e) => setFilterDate(e.target.value)} 
-                className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-surf-500 outline-none font-medium text-gray-700 text-sm"
+                className="pl-10 pr-4 py-2 border border-borde rounded-lg focus:ring-2 focus:ring-secondary/25 outline-none font-medium text-dark text-sm"
               />
             </div>
 
@@ -215,7 +215,7 @@ export default function VentasPage() {
             {filterDate && (
               <button 
                 onClick={() => setFilterDate("")} // Mejor usar string vacío que undefined para el input
-                className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"
+                className="p-2 text-texto-suave/70 hover:text-error hover:bg-error-suave rounded-full transition-all"
                 title="Limpiar filtro"
               >
                 <X size={18} />
@@ -227,24 +227,24 @@ export default function VentasPage() {
 
         <div className="flex-1 overflow-y-auto">
           {loading ? <p className="p-4 text-center">Cargando...</p> : orders.length === 0 ? (
-            <p className="p-10 text-center text-gray-400">No hay ventas en esta fecha</p>
+            <p className="p-10 text-center text-texto-suave/70">No hay ventas en esta fecha</p>
           ) : (
             orders.map(order => {
               // Definimos los colores del borde según el estado
               const statusColors = {
-                PENDING: 'border-l-orange-500',
-                COMPLETED: 'border-l-green-500',
-                CANCELED: 'border-l-red-500'
+                PENDING: 'border-l-aviso',
+                COMPLETED: 'border-l-exito',
+                CANCELED: 'border-l-error'
               };
 
               return (
                 <div 
                   key={order.id} 
                   onClick={() => setSelectedOrder(order)} 
-                  className={`p-4 border-b cursor-pointer transition border-l-4 ${statusColors[order.status]} ${selectedOrder?.id === order.id ? 'bg-surf-50' : 'hover:bg-gray-50'}`}
+                  className={`p-4 border-b border-borde cursor-pointer transition border-l-4 ${statusColors[order.status]} ${selectedOrder?.id === order.id ? 'bg-primary-suave' : 'hover:bg-fondo'}`}
                 >
                   <div className="flex justify-between items-start mb-1">
-                    <span className="font-bold text-gray-700">{order.client || 'Cliente no definido'}</span><span className="font-bold text-gray-700">{' - '}Orden #{order.id}</span>
+                    <span className="font-medium text-dark">{order.client || 'Cliente no definido'}</span><span className="font-medium text-dark">{' - '}Orden #{order.id}</span>
                     <div className="flex items-center gap-2">
                       {/* Botón para volver a PENDING si no lo está */}
                       {order.status !== 'PENDING' && (
@@ -254,7 +254,7 @@ export default function VentasPage() {
                             handleChangeStatus(order.id, {status: 'PENDING'});
                           }}
                           title="Reabrir orden"
-                          className="p-1 text-gray-400 hover:text-orange-500 hover:bg-orange-50 rounded-full transition"
+                          className="p-1 text-texto-suave/70 hover:text-aviso hover:bg-aviso-suave rounded-full transition"
                         >
                           <Clock size={16} />
                         </button>
@@ -263,9 +263,9 @@ export default function VentasPage() {
                     </div>
                   </div>
                   
-                  <div className="flex justify-between text-xs font-bold">
+                  <div className="flex justify-between text-xs font-medium">
                     {/* Formato DD/MM/YYYY HH:MM */}
-                    <span className="text-gray-500">
+                    <span className="text-texto-suave">
                       {new Date(order.createdAt).toLocaleString('es-AR', {
                         timeZone: 'America/Argentina/Buenos_Aires', // Forzamos UTC-3 en el render
                         day: '2-digit',
@@ -276,7 +276,7 @@ export default function VentasPage() {
                         hour12: false
                       })} hs { order.paymentMethod ? `- ${order.paymentMethod}` : '' }
                     </span>
-                    <span className="text-gray-900 text-sm">${order.total?.toFixed(2)}</span>
+                    <span className="text-dark text-sm">${order.total?.toFixed(2)}</span>
                   </div>
                 </div>
               );
@@ -286,14 +286,14 @@ export default function VentasPage() {
       </div>
 
       {/* COLUMNA DERECHA: DETALLE Y BUSCADOR */}
-      <div className="flex-1 flex flex-col bg-gray-100">
+      <div className="flex-1 flex flex-col bg-fondo">
         {selectedOrder ? (
           <>
-            <div className="p-6 bg-white border-b flex justify-between items-center">
+            <div className="p-6 bg-superficie border-b border-borde flex justify-between items-center">
               <div className='flex flex-col'>
                 <div className='flex flex-row gap-4 items-center mb-1'>
-                  <h3 className="text-lg font-black italic uppercase">Detalle Orden #{selectedOrder.id}</h3>
-                  <p className="text-xs font-bold text-gray-400">FECHA: {new Date(selectedOrder.createdAt).toLocaleDateString()}</p>
+                  <h3 className="text-lg font-medium italic uppercase">Detalle Orden #{selectedOrder.id}</h3>
+                  <p className="text-xs font-medium text-texto-suave/70">FECHA: {new Date(selectedOrder.createdAt).toLocaleDateString()}</p>
                 </div>
                 <div className='flex flex-row gap-4 items-end'>
                   {selectedOrder.status === 'PENDING' ? (<>
@@ -309,7 +309,7 @@ export default function VentasPage() {
                             client: e.target.value
                           })
                         }
-                        className="border border-gray-300 rounded px-2 py-1"
+                        className="form-input py-1"
                       />
                     </label>
 
@@ -324,7 +324,7 @@ export default function VentasPage() {
                             paymentMethod: e.target.value || null
                           })
                         }
-                        className="border border-gray-300 rounded px-2 py-1"
+                        className="form-input py-1"
                       >
                         <option value="">No definido</option>
 
@@ -346,7 +346,7 @@ export default function VentasPage() {
                     </label>
 
                     <button
-                      className='flex flex-row text-white bg-surf-500 hover:bg-surf-600 px-4 py-2 rounded-lg font-bold items-center gap-2 transition'
+                      className='btn-primario flex flex-row items-center gap-2'
                       onClick={() =>
                         handleChangeStatus(selectedOrder.id, {
                           client: selectedOrder.client,
@@ -358,7 +358,7 @@ export default function VentasPage() {
                     </button>
                   </>
                   ) : (
-                    <span className="text-sm font-bold text-gray-500">{selectedOrder.client || 'Cliente no definido'}{' - '}{selectedOrder.paymentMethod || 'Pago no definido'}</span>
+                    <span className="text-sm font-medium text-texto-suave">{selectedOrder.client || 'Cliente no definido'}{' - '}{selectedOrder.paymentMethod || 'Pago no definido'}</span>
                   )}
                     </div>
               </div>
@@ -368,7 +368,7 @@ export default function VentasPage() {
                   onClick={() => setImpresion({ orden: selectedOrder, tipo: 'comanda' })}
                   disabled={!selectedOrder.items?.length}
                   title="Imprimir comanda"
-                  className="bg-white text-gray-700 border border-gray-300 px-3 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-gray-50 transition disabled:opacity-40"
+                  className="btn-secundario flex items-center gap-2"
                 >
                   <ChefHat size={18} />
                 </button>
@@ -376,7 +376,7 @@ export default function VentasPage() {
                   onClick={() => setImpresion({ orden: selectedOrder, tipo: 'ticket' })}
                   disabled={!selectedOrder.items?.length}
                   title="Imprimir ticket"
-                  className="bg-white text-gray-700 border border-gray-300 px-3 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-gray-50 transition disabled:opacity-40"
+                  className="btn-secundario flex items-center gap-2"
                 >
                   <Printer size={18} />
                 </button>
@@ -386,11 +386,11 @@ export default function VentasPage() {
                       onClick={() => handleChangeStatus(selectedOrder.id, {status: 'COMPLETED', paymentMethod: selectedOrder.paymentMethod})}
                       disabled={!selectedOrder.paymentMethod} // sin método de pago no se puede cobrar
                       title={!selectedOrder.paymentMethod ? 'Seleccioná un método de pago' : ''}
-                      className="bg-green-600 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-green-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="bg-exito text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 hover:brightness-90 transition disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       <CheckCircle size={18} /> Cobrar
                     </button>
-                    <button onClick={() => handleChangeStatus(selectedOrder.id, {status: 'CANCELED'})} className="bg-white text-red-600 border border-red-200 px-4 py-2 rounded-lg font-bold hover:bg-red-50 transition">
+                    <button onClick={() => handleChangeStatus(selectedOrder.id, {status: 'CANCELED'})} className="bg-superficie text-error border border-error/30 px-4 py-2 rounded-lg font-medium hover:bg-error-suave transition">
                       <XCircle size={18} /> Anular
                     </button>
                   </>
@@ -405,11 +405,11 @@ export default function VentasPage() {
               {selectedOrder.status === 'PENDING' && (
                 <div className="relative w-full">
                   <div className="relative">
-                    <Search className="absolute left-3 top-3 text-gray-400" size={20} />
+                    <Search className="absolute left-3 top-3 text-texto-suave/70" size={20} />
                     <input 
                       type="text"
                       placeholder="Buscar producto..."
-                      className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-surf-500 outline-none transition-all font-bold"
+                      className="w-full pl-10 pr-4 py-3 border-2 border-borde rounded-xl focus:border-secondary outline-none transition-all font-medium"
                       value={searchQuery}
                       onFocus={() => setShowDropdown(true)}
                       onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
@@ -418,21 +418,21 @@ export default function VentasPage() {
                   </div>
 
                   {showDropdown && searchQuery.length > 0 && (
-                    <div className="absolute z-50 w-full mt-1 bg-white border-2 border-gray-100 rounded-xl shadow-2xl overflow-hidden">
+                    <div className="absolute z-50 w-full mt-1 bg-superficie border-2 border-borde rounded-xl shadow-2xl overflow-hidden">
                       <div className="max-h-[320px] overflow-y-auto">
                         {filteredProducts.length > 0 ? (
                           filteredProducts.map((p) => (
                             <div 
                               key={p.id}
                               onMouseDown={() => addItemToOrder(p)}
-                              className="h-[50px] px-4 flex items-center justify-between hover:bg-surf-600 hover:text-white cursor-pointer transition-colors border-b border-gray-50 last:border-0"
+                              className="h-[50px] px-4 flex items-center justify-between hover:bg-primary hover:text-white cursor-pointer transition-colors border-b border-borde last:border-0"
                             >
-                              <span className="font-black italic uppercase text-sm">{p.nombre}</span>
-                              <span className="font-bold bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs group-hover:bg-surf-500">${p.precio?.toFixed(2)}</span>
+                              <span className="font-medium italic uppercase text-sm">{p.nombre}</span>
+                              <span className="font-medium bg-fondo text-dark px-2 py-1 rounded text-xs group-hover:bg-primary">${p.precio?.toFixed(2)}</span>
                             </div>
                           ))
                         ) : (
-                          <div className="p-4 text-center text-gray-400 font-bold">No se encontraron productos</div>
+                          <div className="p-4 text-center text-texto-suave/70 font-medium">No se encontraron productos</div>
                         )}
                       </div>
                     </div>
@@ -441,10 +441,10 @@ export default function VentasPage() {
               )}
 
               {/* TABLA DE ITEMS */}
-              <div className="bg-white rounded-2xl shadow-sm border overflow-hidden">
+              <div className="bg-superficie rounded-2xl shadow-sm border border-borde overflow-hidden">
                 <table className="w-full text-left">
-                  <thead className="bg-gray-50 border-b">
-                    <tr className="text-gray-400 uppercase text-xs font-black">
+                  <thead className="bg-fondo border-b border-borde">
+                    <tr className="text-texto-suave/70 uppercase text-xs font-medium">
                       <th className="p-4">Producto</th>
                       <th className="p-4">Cant.</th>
                       <th className="p-4 text-right">Unit.</th>
@@ -455,11 +455,11 @@ export default function VentasPage() {
                   {/* ... dentro de <table> ... */}
                   <tbody>
                     {selectedOrder.items?.map(item => (
-                      <tr key={item.id} className="border-b last:border-0 hover:bg-gray-50 transition-colors">
+                      <tr key={item.id} className="border-b border-borde last:border-0 hover:bg-fondo transition-colors">
                         
                         {/* 1. COLUMNA PRODUCTO: Aquí va el nombre */}
                         <td className="p-4">
-                          <span className="font-bold text-gray-800 uppercase text-sm">
+                          <span className="font-medium text-dark uppercase text-sm">
                             {item.nombre}
                           </span>
                         </td>
@@ -470,20 +470,20 @@ export default function VentasPage() {
                             {selectedOrder.status === 'PENDING' && (
                               <button 
                                 onClick={() => handleUpdateItem(item.productId, 'REMOVE')} 
-                                className="p-1 hover:bg-red-100 text-red-600 rounded transition"
+                                className="p-1 hover:bg-error-suave text-error rounded transition"
                               >
                                 <Minus size={14} strokeWidth={3}/>
                               </button>
                             )}
                             
-                            <span className="bg-surf-100 text-surf-700 px-3 py-1 rounded-lg font-black text-xs min-w-[32px] text-center">
+                            <span className="bg-primary-suave text-secondary px-3 py-1 rounded-lg font-medium text-xs min-w-[32px] text-center">
                               {item.cantidad}
                             </span>
 
                             {selectedOrder.status === 'PENDING' && (
                               <button 
                                 onClick={() => handleUpdateItem(item.productId, 'ADD')} 
-                                className="p-1 hover:bg-green-100 text-green-600 rounded transition"
+                                className="p-1 hover:bg-exito-suave text-exito rounded transition"
                               >
                                 <Plus size={14} strokeWidth={3}/>
                               </button>
@@ -492,12 +492,12 @@ export default function VentasPage() {
                         </td>
 
                         {/* 3. COLUMNA UNITARIO: El precio snapshot del back */}
-                        <td className="p-4 text-right font-medium text-gray-600">
+                        <td className="p-4 text-right font-medium text-texto-suave">
                           ${item.precio?.toFixed(2)}
                         </td>
 
                         {/* 4. COLUMNA TOTAL: Multiplicación de precio x cantidad */}
-                        <td className="p-4 text-right font-black text-gray-900">
+                        <td className="p-4 text-right font-medium text-dark">
                           ${(item.precio * item.cantidad).toFixed(2)}
                         </td>
 
@@ -506,7 +506,7 @@ export default function VentasPage() {
                           <td className="p-4 text-right">
                             <button 
                               onClick={() => handleUpdateItem(item.productId, 'DELETE')}
-                              className="text-gray-300 hover:text-red-600 transition-colors"
+                              className="btn-icono btn-icono-borrar"
                             >
                               <Trash2 size={18} />
                             </button>
@@ -516,17 +516,17 @@ export default function VentasPage() {
                     ))}
                   </tbody>
                 </table>
-                <div className="p-6 bg-gray-900 flex justify-between items-center text-white">
-                    <span className="font-black italic uppercase tracking-widest text-gray-400">Total Orden</span>
-                    <span className="text-4xl font-black">${selectedOrder.total?.toFixed(2)}</span>
+                <div className="p-6 bg-dark flex justify-between items-center text-white">
+                    <span className="font-medium italic uppercase tracking-widest text-white/60">Total Orden</span>
+                    <span className="text-4xl font-medium">${selectedOrder.total?.toFixed(2)}</span>
                 </div>
               </div>
             </div>
           </>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center text-gray-300">
+          <div className="flex-1 flex flex-col items-center justify-center text-borde-fuerte">
             <Clock size={80} strokeWidth={1} className="mb-4 opacity-20" />
-            <p className="text-xl font-black italic uppercase">Esperando Selección</p>
+            <p className="text-xl font-medium italic uppercase">Esperando Selección</p>
           </div>
         )}
       </div>

@@ -5,7 +5,7 @@ import ModalLoading from "../ModalLoading";
 const plata = (valor) => `$${valor.toFixed(2)}`;
 
 // color según la diferencia: rojo falta, ámbar sobra, verde ok
-const colorDiferencia = (dif) => dif < 0 ? 'text-red-600' : dif > 0 ? 'text-amber-600' : 'text-green-600';
+const colorDiferencia = (dif) => dif < 0 ? 'text-error' : dif > 0 ? 'text-aviso' : 'text-exito';
 
 // Cierre de caja: el usuario completa lo contado/controlado de CADA método de pago
 // (efectivo del cajón, cierre del posnet de débito, crédito, etc.)
@@ -55,20 +55,20 @@ export default function CerrarCajaForm (props){
         { isLoading && <ModalLoading/>}
         <div className="form-card">
             <h3 className="form-titulo">Cerrar caja</h3>
-            <p className="text-xs text-gray-500">Completá lo contado de cada método (0 si no hubo).</p>
+            <p className="text-xs text-texto-suave">Completá lo contado de cada método (0 si no hubo).</p>
             {props.detalle.map((m) => {
               const dif = diferenciaDe(m);
               return (
                 <div key={m.metodo} className="flex flex-col gap-1">
                   <div className="flex justify-between text-sm">
                     <span>{m.metodo}</span>
-                    <span className="text-gray-500">sistema {plata(m.montoSistema)}</span>
+                    <span className="text-texto-suave">sistema {plata(m.montoSistema)}</span>
                   </div>
                   <input className="form-input" type="number" min="0"
                   value={contados[m.metodo] ?? ""}
                   onChange={(e)=>handleChange(m.metodo, e.target.value)}/>
                   {dif !== null && (
-                    <span className={`text-xs font-bold ${colorDiferencia(dif)}`}>
+                    <span className={`text-xs font-medium ${colorDiferencia(dif)}`}>
                       Diferencia: {plata(dif)} {dif < 0 ? '(falta)' : dif > 0 ? '(sobra)' : '(ok)'}
                     </span>
                   )}
@@ -76,7 +76,7 @@ export default function CerrarCajaForm (props){
               );
             })}
             {completos && (
-              <p className={`text-sm font-black ${colorDiferencia(diferenciaTotal)}`}>
+              <p className={`text-sm font-medium ${colorDiferencia(diferenciaTotal)}`}>
                 Diferencia total: {plata(diferenciaTotal)}
               </p>
             )}
@@ -85,7 +85,7 @@ export default function CerrarCajaForm (props){
                 value={comentario}
                 onChange={(e)=>setComentario(e.target.value)}/>
             </div>
-            {error && <p className="text-red-500 text-xs">{error}</p>}
+            {error && <p className="form-error">{error}</p>}
             <button className="btn-peligro" onClick={handleCerrar} disabled={!completos}>
                 Cerrar caja
             </button>

@@ -88,19 +88,19 @@ export default function DashboardPage() {
     : 0;
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] p-4 md:p-8">
+    <div className="min-h-screen bg-fondo p-4 md:p-8">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* HEADER SECTION */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Reporte de Ventas</h1>
-            <p className="text-slate-500 font-medium">Análisis de rendimiento comercial (UTC-3)</p>
+            <h1 className="text-3xl font-medium text-dark tracking-tight">Reporte de Ventas</h1>
+            <p className="text-texto-suave font-medium">Análisis de rendimiento comercial (UTC-3)</p>
           </div>
 
           {/* Date Range Picker Container */}
           <div className="relative inline-block">
-            <div className="flex items-center bg-white border border-slate-200 rounded-2xl shadow-sm px-4 py-2.5 hover:border-surf-400 transition-all cursor-pointer group">
-              <Calendar size={20} className="text-surf-500 mr-3 group-hover:scale-110 transition-transform" />
+            <div className="flex items-center bg-superficie border border-borde rounded-2xl shadow-sm px-4 py-2.5 hover:border-primary transition-all cursor-pointer group">
+              <Calendar size={20} className="text-primary mr-3 group-hover:scale-110 transition-transform" />
               <DatePicker
                 selected={startDate}
                 onChange={handleDateChange}
@@ -110,16 +110,16 @@ export default function DashboardPage() {
                 maxDate={new Date()}
                 dateFormat="dd MMM, yyyy"
                 locale={es}
-                className="bg-transparent border-none focus:ring-0 text-sm font-bold text-slate-700 cursor-pointer w-44 md:w-52"
+                className="bg-transparent border-none focus:ring-0 text-sm font-medium text-dark cursor-pointer w-44 md:w-52"
                 placeholderText="Seleccionar periodo"
               />
-              <ChevronDown size={18} className="text-slate-400 ml-1" />
+              <ChevronDown size={18} className="text-texto-suave/70 ml-1" />
             </div>
           </div>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-center gap-3">
+          <div className="bg-error-suave border border-error/30 text-error px-4 py-3 rounded-xl flex items-center gap-3">
             <AlertCircle size={20} /> {error}
           </div>
         )}
@@ -150,14 +150,14 @@ export default function DashboardPage() {
         </div>
 
         {/* CHART SECTION */}
-        <div className="bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-slate-200">
+        <div className="bg-superficie p-6 md:p-8 rounded-2xl shadow-sm border border-borde">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h3 className="text-xl font-bold text-slate-800">Tendencia de Ingresos</h3>
-              <p className="text-sm text-slate-500">Visualización de la línea de tiempo completa</p>
+              <h3 className="text-xl font-medium text-dark">Tendencia de Ingresos</h3>
+              <p className="text-sm text-texto-suave">Visualización de la línea de tiempo completa</p>
             </div>
             {loading && (
-              <div className="flex items-center gap-2 text-surf-500 text-sm font-medium">
+              <div className="flex items-center gap-2 text-primary text-sm font-medium">
                 <Loader2 className="animate-spin" size={18} /> Actualizando...
               </div>
             )}
@@ -168,16 +168,16 @@ export default function DashboardPage() {
               <AreaChart data={chartData}>
                 <defs>
                   <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#016a99" stopOpacity={0.15}/>
-                    <stop offset="95%" stopColor="#016a99" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.15}/>
+                    <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-borde)" />
                 <XAxis 
                   dataKey="date" 
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: '#64748b', fontSize: 12 }}
+                  tick={{ fill: 'var(--color-texto-suave)', fontSize: 12 }}
                   minTickGap={40}
                   tickFormatter={(val) => format(parseISO(val), "dd MMM")}
                   dy={10}
@@ -185,14 +185,14 @@ export default function DashboardPage() {
                 <YAxis 
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: '#64748b', fontSize: 12 }}
+                  tick={{ fill: 'var(--color-texto-suave)', fontSize: 12 }}
                   tickFormatter={(val) => `$${val}`}
                 />
-                <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#016a99', strokeWidth: 1 }} />
+                <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'var(--color-primary)', strokeWidth: 1 }} />
                 <Area 
                   type="monotone" 
                   dataKey="total" 
-                  stroke="#016a99" 
+                  stroke="var(--color-primary)" 
                   strokeWidth={3}
                   fillOpacity={1} 
                   fill="url(#colorTotal)" 
@@ -212,19 +212,19 @@ export default function DashboardPage() {
  */
 function StatCard({ label, value, icon, color, description }) {
   const themes = {
-    emerald: "bg-emerald-50 text-emerald-600 border-emerald-100",
-    blue: "bg-surf-50 text-surf-600 border-surf-100",
-    violet: "bg-violet-50 text-violet-600 border-violet-100",
+    emerald: "bg-exito-suave text-exito border-exito/20",
+    blue: "bg-primary-suave text-secondary border-borde",
+    violet: "bg-aviso-suave text-aviso border-aviso/20",
   };
 
   return (
-    <div className="bg-white p-6 rounded-[1.5rem] border border-slate-200 shadow-sm transition-hover hover:shadow-md transition-all">
+    <div className="bg-superficie p-6 rounded-2xl border border-borde shadow-sm transition-hover hover:shadow-md transition-all">
       <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-5 border ${themes[color]}`}>
         {React.cloneElement(icon, { size: 28 })}
       </div>
-      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{label}</p>
-      <h2 className="text-3xl font-black text-slate-900 mt-1">{value}</h2>
-      <p className="text-sm text-slate-500 mt-2">{description}</p>
+      <p className="text-xs font-medium text-texto-suave/70 uppercase tracking-widest">{label}</p>
+      <h2 className="text-3xl font-medium not-italic text-dark mt-1">{value}</h2>
+      <p className="text-sm text-texto-suave mt-2">{description}</p>
     </div>
   );
 }
@@ -235,15 +235,15 @@ function StatCard({ label, value, icon, color, description }) {
 function CustomTooltip({ active, payload, label }) {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-slate-900 text-white p-4 rounded-2xl shadow-2xl border border-slate-800">
-        <p className="text-xs font-bold text-slate-400 mb-2 uppercase tracking-tight">
+      <div className="bg-dark text-white p-4 rounded-2xl shadow-2xl border border-dark">
+        <p className="text-xs font-medium text-white/60 mb-2 uppercase tracking-tight">
           {label ? format(parseISO(label), "eeee, dd 'de' MMMM", { locale: es }) : ""}
         </p>
         <div className="space-y-1">
-          <p className="text-xl font-black text-surf-400">
+          <p className="text-xl font-medium text-primary">
             ${payload[0].value.toLocaleString()}
           </p>
-          <p className="text-xs text-slate-400 font-medium">
+          <p className="text-xs text-white/60 font-medium">
             {payload[0].payload.orders} pedidos registrados
           </p>
         </div>

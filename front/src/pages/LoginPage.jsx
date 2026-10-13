@@ -84,17 +84,16 @@ export default function LoginPage(){
 
      return (
     // fondo con el azul del logo y tarjeta blanca al centro
-    <div className="min-h-screen flex items-center justify-center text-black bg-surf-600">
+    <div className="min-h-screen flex items-center justify-center text-dark bg-nav">
       <div className="card" style={{ width:380, padding:24 }}>
         <div className="flex flex-col items-center gap-2 mb-4">
           <img src={Logo} alt="Surf Coffee" className="h-28" />
-          <h2 className="m-0 text-xl font-bold text-surf-800">{isRegister ? 'Registrarse' : 'Iniciar sesión'}</h2>
+          <h2 className="m-0 text-xl font-medium text-dark">{isRegister ? 'Registrarse' : 'Iniciar sesión'}</h2>
         </div>
 
-        <form onSubmit={isRegister ? handleRegister : handleLogin} style={{ display:'grid', gap:10, color:'black' }}>
+        <form onSubmit={isRegister ? handleRegister : handleLogin} style={{ display:'grid', gap:10 }}>
           {isRegister && (
             <input
-              style={{color:'black'}}
               className="form-input"
               type="text"
               placeholder="Nombre"
@@ -103,7 +102,6 @@ export default function LoginPage(){
             />
           )}
           <input
-            style={{color:'black'}}
             className="form-input"
             type="email"
             placeholder="Correo"
@@ -111,7 +109,6 @@ export default function LoginPage(){
             onChange={(e)=>setEmail(e.target.value)}
           />
           <input
-            style={{color:'black'}}
             className="form-input"
             type="password"
             placeholder="Contraseña"
@@ -119,20 +116,20 @@ export default function LoginPage(){
             onChange={(e)=>setPassword(e.target.value)}
           />
 
-          {error && <div style={{ color:'#b91c1c', fontSize:14 }}>{error}</div>}
+          {error && <div className="text-error text-sm">{error}</div>}
 
           <button className="btn-primario" type="submit">{isRegister ? "Registrarme" : "Ingresar"}</button>
         </form>
         <div style={{ marginTop:16, fontSize:14 }}>
           {isRegister ? '¿Ya tenés cuenta?' : '¿No tenés cuenta?'}&nbsp;
           <button
-            className="text-surf-600 font-semibold hover:underline"
+            className="text-primary font-medium hover:underline"
             onClick={()=>setIsRegister(!isRegister)}
           >
             {isRegister ? 'Iniciá sesión' : 'Registrate'}
           </button>
         </div>
-        <div className="flex flex-col text-gray-500">
+        <div className="flex flex-col text-texto-suave">
             <p>usuario : pedro@gmail.com </p>
             <p>password : Pedro123</p>
         </div>

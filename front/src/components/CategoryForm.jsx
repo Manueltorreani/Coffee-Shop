@@ -15,9 +15,9 @@ export default function CategoryForm({ onSubmit, initialData, onCancel }) {
   };
 
   return (
-    <div className="flex flex-col items-start gap-2 p-4 bg-surf-50 border border-surf-100 rounded-2xl font-semibold text-surf-800">
+    <div className="flex flex-col items-start gap-2 p-4 bg-primary-suave border border-borde rounded-2xl font-medium text-dark">
         {initialData ? `Actualizando categoría "${initialData.nombre}"` : `Creando nueva categoría`}
-        <form onSubmit={handleSubmit} className="flex gap-2 p-3 bg-white rounded-xl border border-slate-200">
+        <form onSubmit={handleSubmit} className="flex gap-2 p-3 bg-superficie rounded-xl border border-borde">
         <input
             type="text"
             placeholder="Nombre de la categoría"

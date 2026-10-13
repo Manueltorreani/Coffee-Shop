@@ -11,7 +11,7 @@ export default function Pagination({ page, totalPages, onPageChange}){
             <button className="btn-secundario py-1" disabled={prevDisabled} onClick={() => onPageChange(page-1)}>
                anterior
             </button>
-            <span className="text-slate-600">
+            <span className="text-texto-suave">
                 Pagina {page} de {totalPages}
             </span>
             <button className="btn-secundario py-1" disabled={nextDisabled} onClick={() => onPageChange(page + 1)}>

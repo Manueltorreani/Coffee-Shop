@@ -139,7 +139,7 @@ export default function GastosForm (props){
             </select>
         </div>
 
-        {error && <p className="text-red-500 text-xs">{error}</p>}
+        {error && <p className="form-error">{error}</p>}
 
         <button className="btn-primario"
             onClick={() => {

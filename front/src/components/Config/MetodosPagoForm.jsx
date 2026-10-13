@@ -62,9 +62,9 @@ export default function MetodosPagoForm (props){
                 <input className="form-input" type="text" placeholder="Efectivo"
                 value={nombre}
                 onChange={(e)=>setNombre(e.target.value)}/>
-                {error && <p className="text-red-500 text-xs">{error}</p>}
+                {error && <p className="form-error">{error}</p>}
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-texto-suave">
                 Importante: la Caja cuenta como efectivo el método llamado exactamente "Efectivo".
             </p>
             <button className="btn-primario" onClick={ () => {

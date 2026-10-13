@@ -59,21 +59,21 @@ const MetodosPagoPanel = forwardRef((props,ref) => {
           <table className="w-full text-sm">
             <thead>
               <tr className="tabla-head">
-                <th className="px-4 py-3 text-left w-[30px]">#</th>
-                <th className="px-4 py-3 text-left">Nombre</th>
-                <th className="px-4 py-3 text-left w-[70px]">Accion</th>
+                <th className="tabla-celda text-left w-[30px]">#</th>
+                <th className="tabla-celda text-left">Nombre</th>
+                <th className="tabla-celda text-left w-[70px]">Accion</th>
               </tr>
             </thead>
             <tbody>
               {metodos.map((row) => (
-                <tr key={row.id} className="border-t border-gray-100 hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-3 text-gray-400">{row.id}</td>
-                  <td className="px-4 py-3 font-medium text-gray-800">{row.nombre}</td>
+                <tr key={row.id} className="tabla-fila">
+                  <td className="tabla-celda text-texto-suave/70">{row.id}</td>
+                  <td className="tabla-celda font-medium text-dark">{row.nombre}</td>
                   <td className="px-3 py-2 flex flex-row gap-2">
-                    <button onClick={() => handleDelete(row.id)} className="text-gray-400 hover:text-red-500 transition-colors">
+                    <button onClick={() => handleDelete(row.id)} className="btn-icono btn-icono-borrar">
                       <Trash2 size={15} />
                     </button>
-                    <button onClick={() => setEditando(row)} className="text-gray-400 hover:text-amber-500 transition-colors">
+                    <button onClick={() => setEditando(row)} className="btn-icono btn-icono-editar">
                       <SquarePen size={15} />
                     </button>
                   </td>

@@ -70,9 +70,9 @@ export default function TipoGastosForm (props){
                 <input className="form-input" type="text" name="nombre" id="nombre" placeholder="luz"
                 value={nombre}
                 onChange={(e)=>setNombre(e.target.value)}/>
-                {error && <p className="text-red-500 text-xs">{error}</p>}
+                {error && <p className="form-error">{error}</p>}
             </div>
-             <div className="flex flex-row gap-2 items-center text-sm font-medium text-slate-600">Activo
+             <div className="flex flex-row gap-2 items-center text-sm font-medium text-texto-suave">Activo
                 <input className="w-5 h-5 " type="checkbox" name="activo" id="activo"
                 checked={isActive}
                 onChange={(e)=>setIsActive(e.target.checked)}/>

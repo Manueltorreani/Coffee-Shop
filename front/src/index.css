@@ -1,21 +1,65 @@
 @import "tailwindcss";
 
-/* ===== PALETA DE LA MARCA (azul del logo "surf coffee") =====
-   @theme es la forma de Tailwind v4 de agregar colores propios:
-   al definir --color-surf-600 se habilitan clases como bg-surf-600, text-surf-600, border-surf-600, etc.
-   600 = azul exacto del fondo del logo, 800 = azul de los contornos. */
+/* ===== SISTEMA DE DISEÑO: TOKENS (marca Surf Coffee) =====
+   @theme es la forma de Tailwind v4 de agregar colores y fuentes propios:
+   al definir --color-primary se habilitan clases como bg-primary, text-primary, border-primary, etc.
+   Los colores se nombran por su FUNCIÓN, no por su tono: si cambia la marca, se cambia acá y nada más. */
 @theme {
-  --color-surf-50:  #eef7fb;
-  --color-surf-100: #d5ecf5;
-  --color-surf-200: #abd8eb;
-  --color-surf-300: #74bcda;
-  --color-surf-400: #3a9bc4;
-  --color-surf-500: #1281b0;
-  --color-surf-600: #016a99;
-  --color-surf-700: #015a82;
-  --color-surf-800: #024f6b;
-  --color-surf-900: #063f55;
-  --color-surf-950: #04293a;
+  /* Marca */
+  --color-primary:       #00A0C8; /* botones principales, links, ítem activo */
+  --color-primary-hover: #007EA5;
+  --color-primary-suave: #E5F5FA; /* cabecera de tablas, fondo de pestañas, hover suave */
+  --color-secondary:     #006B96; /* badges, borde de foco */
+  --color-nav:           #005F8A; /* barra superior / menú */
+  --color-dark:          #003B4F; /* texto principal, fondos oscuros */
+
+  /* Neutros (grises con un toque del azul de la marca) */
+  --color-fondo:        #F2F7F9; /* fondo de la app */
+  --color-superficie:   #FFFFFF; /* tarjetas, modales */
+  --color-borde:        #D9E3E8; /* bordes de tarjetas y filas */
+  --color-borde-fuerte: #B8C7CF; /* bordes de inputs */
+  --color-texto-suave:  #5B7480; /* texto secundario, labels */
+
+  /* Estados: el color fuerte es para texto/botón, el suave para el fondo del badge o aviso */
+  --color-exito:       #18794E;
+  --color-exito-suave: #E3F4EA;
+  --color-error:       #C8323C;
+  --color-error-suave: #FBE6E7;
+  --color-aviso:       #9A5B00;
+  --color-aviso-suave: #FCF0D9;
+
+  /* Tipografía: Archivo (se carga en index.html). --font-sans es la fuente por defecto de Tailwind */
+  --font-sans: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+}
+
+/* ===== BASE: tipografía de toda la app =====
+   Cuerpo: Archivo Regular, semi-expandida (112.5%). Títulos: Medium Italic.
+   Al estar en la capa base, cualquier clase de Tailwind puesta en el elemento le gana. */
+@layer base {
+  /* La app ocupa toda la pantalla: el layout (sidebar + contenido) usa height: 100% */
+  html, body, #root {
+    height: 100%;
+  }
+  body {
+    font-stretch: 112.5%;
+    color: var(--color-dark);
+    background: var(--color-fondo);
+  }
+  /* Venía de la plantilla de Vite (App.css): centra el texto de toda la app salvo donde se indique otra cosa.
+     Se conserva para no cambiar la alineación actual. */
+  #root {
+    text-align: center;
+  }
+  h1, h2, h3 {
+    font-weight: 500;
+    font-style: italic;
+  }
+  /* Solo cargamos los pesos 400 y 500 de Archivo: el énfasis usa Medium en vez de una negrita simulada.
+     Va dentro de #root para no afectar al ticket impreso (.print-area), que usa monospace. */
+  #root :is(b, strong) {
+    font-weight: 500;
+  }
 }
 
 /* ===== CLASES REUTILIZABLES =====
@@ -24,46 +68,107 @@
 @layer components {
   /* Botones */
   .btn-primario {
-    @apply bg-surf-600 hover:bg-surf-700 text-white font-semibold px-4 py-2 rounded-xl shadow-sm transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed;
+    @apply bg-primary hover:bg-primary-hover text-white font-medium px-4 py-2 rounded-xl shadow-sm transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed;
   }
   .btn-secundario {
-    @apply bg-white hover:bg-surf-50 text-surf-700 border border-surf-200 font-semibold px-4 py-2 rounded-xl transition-colors cursor-pointer disabled:opacity-40;
+    @apply bg-superficie hover:bg-primary-suave text-secondary border border-borde font-medium px-4 py-2 rounded-xl transition-colors cursor-pointer disabled:opacity-40;
   }
   .btn-peligro {
-    @apply bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-xl shadow-sm transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed;
+    @apply bg-error hover:brightness-90 text-white font-medium px-4 py-2 rounded-xl shadow-sm transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed;
   }
 
   /* Pestañas de las páginas (Gastos, Caja, Configuración) */
   .tabs {
-    @apply flex flex-row gap-1 flex-wrap bg-surf-50 p-1 rounded-xl border border-surf-100;
+    @apply flex flex-row gap-1 flex-wrap bg-primary-suave p-1 rounded-xl border border-borde;
   }
   .tab {
-    @apply px-4 py-2 rounded-lg text-sm font-semibold text-surf-800 hover:bg-white/70 transition-colors cursor-pointer;
+    @apply px-4 py-2 rounded-lg text-sm font-medium text-dark hover:bg-white/70 transition-colors cursor-pointer;
   }
   .tab-activo {
-    @apply bg-white text-surf-700 shadow-sm;
+    @apply bg-superficie text-primary-hover shadow-sm;
+  }
+
+  /* Tarjeta genérica (login y contenedor blanco del layout) */
+  .card {
+    @apply bg-superficie border border-borde rounded-xl shadow-sm;
   }
 
   /* Tarjeta de formulario */
   .form-card {
-    @apply w-[300px] bg-white text-slate-800 rounded-2xl shadow-sm border border-slate-200 flex flex-col gap-3 py-5 px-5;
+    @apply w-[300px] bg-superficie text-dark rounded-2xl shadow-sm border border-borde flex flex-col gap-3 py-5 px-5;
   }
   .form-titulo {
-    @apply text-lg font-bold text-surf-800 border-b border-surf-100 pb-2;
+    @apply text-lg text-dark border-b border-borde pb-2;
   }
   .form-campo {
-    @apply flex flex-col gap-1 text-sm font-medium text-slate-600;
+    @apply flex flex-col gap-1 text-sm font-medium text-texto-suave;
   }
   .form-input {
-    @apply p-2 border border-slate-300 rounded-xl bg-white text-slate-800 outline-none transition focus:border-surf-500 focus:ring-2 focus:ring-surf-200;
+    @apply p-2 border border-borde-fuerte rounded-xl bg-superficie text-dark outline-none transition focus:border-secondary focus:ring-2 focus:ring-secondary/25;
   }
 
   /* Tablas */
   .tabla-card {
-    @apply bg-white text-slate-800 rounded-2xl shadow-sm border border-slate-200 overflow-y-auto;
+    @apply bg-superficie text-dark rounded-2xl shadow-sm border border-borde overflow-y-auto;
   }
   .tabla-head {
-    @apply bg-surf-50 text-xs text-surf-800 font-semibold uppercase tracking-wide;
+    @apply bg-primary-suave text-xs text-dark font-medium uppercase tracking-wide;
+  }
+  .tabla-fila {
+    @apply border-t border-borde hover:bg-fondo transition-colors;
+  }
+  .tabla-celda {
+    @apply px-4 py-3;
+  }
+
+  /* Botones de ícono de las tablas (lápiz, tacho): grises y toman color al pasar el mouse */
+  .btn-icono {
+    @apply text-texto-suave/70 transition-colors cursor-pointer;
+  }
+  .btn-icono-editar {
+    @apply hover:text-aviso;
+  }
+  .btn-icono-borrar {
+    @apply hover:text-error;
+  }
+
+  /* Badges: .badge da la forma y se combina con UNA variante de color.
+     Ej: <span className="badge badge-exito">activo</span> */
+  .badge {
+    @apply inline-block px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+  .badge-exito {
+    @apply bg-exito-suave text-exito;
+  }
+  .badge-error {
+    @apply bg-error-suave text-error;
+  }
+  .badge-aviso {
+    @apply bg-aviso-suave text-aviso;
+  }
+  .badge-neutro {
+    @apply bg-fondo text-texto-suave;
+  }
+  .badge-marca {
+    @apply bg-primary-suave text-secondary;
+  }
+
+  /* Mensaje de error debajo de un form (ej. el 409 de nombre repetido) */
+  .form-error {
+    @apply text-error text-xs;
+  }
+
+  /* Título principal de cada página */
+  .titulo-pagina {
+    @apply text-2xl font-medium italic text-dark;
+  }
+
+  /* Modales: fondo oscuro que tapa la pantalla + caja blanca centrada */
+  .modal-fondo {
+    @apply fixed z-90 inset-0 bg-dark/50 flex justify-center items-center;
+  }
+  .modal-caja {
+    @apply relative bg-superficie p-4 rounded-2xl shadow-lg;
   }
 }
 
@@ -80,7 +185,7 @@
   border-top-left-radius: 0.75rem;
 }
 .react-datepicker__day--selected, .react-datepicker__day--in-range {
-  background-color: var(--color-surf-600) !important;
+  background-color: var(--color-primary) !important;
   border-radius: 0.375rem;
 }
 

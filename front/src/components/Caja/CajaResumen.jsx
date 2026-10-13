@@ -35,10 +35,10 @@ export default function CajaResumen ({ caja, onChange }){
       <div className="flex flex-col gap-3">
         <div className="tabla-card p-4 flex flex-col gap-2">
           <div className="flex justify-between items-center">
-            <span className="font-bold">Caja #{caja.id}</span>
-            <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">abierta</span>
+            <span className="font-medium">Caja #{caja.id}</span>
+            <span className="badge badge-exito">abierta</span>
           </div>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-texto-suave">
             Abierta el {formatoFecha(caja.fechaApertura)} por {caja.usuarioApertura?.nombre || caja.usuarioApertura?.email}
           </p>
           {/* Fórmula por método: sistema = inicial + ventas + ingresos − gastos − egresos */}
@@ -56,19 +56,19 @@ export default function CajaResumen ({ caja, onChange }){
             </thead>
             <tbody>
               {detalle.map((m) => (
-                <tr key={m.metodo} className="border-t border-gray-100">
+                <tr key={m.metodo} className="border-t border-borde">
                   <td className="px-3 py-2 font-medium">{m.metodo}</td>
-                  <td className="px-3 py-2 text-right text-gray-600">{plata(m.montoInicial)}</td>
-                  <td className="px-3 py-2 text-right text-gray-600">{plata(m.ventas)}</td>
-                  <td className="px-3 py-2 text-right text-gray-600">{plata(m.ingresos)}</td>
-                  <td className="px-3 py-2 text-right text-gray-600">{plata(m.gastos)}</td>
-                  <td className="px-3 py-2 text-right text-gray-600">{plata(m.egresos)}</td>
-                  <td className="px-3 py-2 text-right font-bold">{plata(m.montoSistema)}</td>
+                  <td className="px-3 py-2 text-right text-texto-suave">{plata(m.montoInicial)}</td>
+                  <td className="px-3 py-2 text-right text-texto-suave">{plata(m.ventas)}</td>
+                  <td className="px-3 py-2 text-right text-texto-suave">{plata(m.ingresos)}</td>
+                  <td className="px-3 py-2 text-right text-texto-suave">{plata(m.gastos)}</td>
+                  <td className="px-3 py-2 text-right text-texto-suave">{plata(m.egresos)}</td>
+                  <td className="px-3 py-2 text-right font-medium">{plata(m.montoSistema)}</td>
                 </tr>
               ))}
-              <tr className="border-t-2 border-gray-800">
-                <td className="px-3 py-2 font-black" colSpan={6}>Total sistema</td>
-                <td className="px-3 py-2 text-right font-black text-lg">{plata(montoSistema)}</td>
+              <tr className="border-t-2 border-dark">
+                <td className="px-3 py-2 font-medium" colSpan={6}>Total sistema</td>
+                <td className="px-3 py-2 text-right font-medium text-lg">{plata(montoSistema)}</td>
               </tr>
             </tbody>
           </table>
@@ -78,31 +78,31 @@ export default function CajaResumen ({ caja, onChange }){
           <table className="w-full text-sm">
             <thead>
               <tr className="tabla-head">
-                <th className="px-4 py-3 text-left">Hora</th>
-                <th className="px-4 py-3 text-left">Tipo</th>
-                <th className="px-4 py-3 text-left">Método</th>
-                <th className="px-4 py-3 text-left">Descripción</th>
-                <th className="px-4 py-3 text-right">Monto</th>
-                <th className="px-4 py-3 text-left w-[50px]"></th>
+                <th className="tabla-celda text-left">Hora</th>
+                <th className="tabla-celda text-left">Tipo</th>
+                <th className="tabla-celda text-left">Método</th>
+                <th className="tabla-celda text-left">Descripción</th>
+                <th className="tabla-celda text-right">Monto</th>
+                <th className="tabla-celda text-left w-[50px]"></th>
               </tr>
             </thead>
             <tbody>
               {caja.movimientos.length === 0 && (
-                <tr><td colSpan={6} className="px-4 py-3 text-center text-gray-400">Sin movimientos manuales</td></tr>
+                <tr><td colSpan={6} className="tabla-celda text-center text-texto-suave/70">Sin movimientos manuales</td></tr>
               )}
               {caja.movimientos.map((row) => (
-                <tr key={row.id} className="border-t border-gray-100 hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-3 text-gray-500">{formatoFecha(row.createdAt)}</td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${row.tipo === 'INGRESO' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                <tr key={row.id} className="tabla-fila">
+                  <td className="tabla-celda text-texto-suave">{formatoFecha(row.createdAt)}</td>
+                  <td className="tabla-celda">
+                    <span className={`badge ${row.tipo === 'INGRESO' ? 'badge-exito' : 'badge-error'}`}>
                       {row.tipo === 'INGRESO' ? "ingreso" : "egreso"}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-gray-600">{row.paymentMethod}</td>
-                  <td className="px-4 py-3 text-gray-800">{row.descripcion}</td>
-                  <td className="px-4 py-3 text-right font-medium">{plata(row.monto)}</td>
+                  <td className="tabla-celda text-texto-suave">{row.paymentMethod}</td>
+                  <td className="tabla-celda text-dark">{row.descripcion}</td>
+                  <td className="tabla-celda text-right font-medium">{plata(row.monto)}</td>
                   <td className="px-3 py-2">
-                    <button onClick={() => handleDelete(row.id)} className="text-gray-400 hover:text-red-500 transition-colors">
+                    <button onClick={() => handleDelete(row.id)} className="btn-icono btn-icono-borrar">
                       <Trash2 size={15} />
                     </button>
                   </td>

@@ -102,7 +102,7 @@ export default function DatosLocalForm ({ mode }){
           ) : (
             <>
               <h3 className="form-titulo">Impresión de tickets y comandas</h3>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-texto-suave">
                 La impresora se instala en Windows como cualquier otra. Al imprimir se abre el diálogo
                 del navegador: elegí la impresora térmica, márgenes "Ninguno" y desactivá encabezados.
               </p>
@@ -113,7 +113,7 @@ export default function DatosLocalForm ({ mode }){
                     <option value={80}>80 mm</option>
                   </select>
               </div>
-              <div className="flex flex-row gap-2 items-center text-sm font-medium text-slate-600">Imprimir ticket automáticamente al cobrar
+              <div className="flex flex-row gap-2 items-center text-sm font-medium text-texto-suave">Imprimir ticket automáticamente al cobrar
                   <input className="w-5 h-5" type="checkbox" name="imprimirAlCobrar"
                   checked={config.imprimirAlCobrar} onChange={handleChange}/>
               </div>
@@ -122,8 +122,8 @@ export default function DatosLocalForm ({ mode }){
               </button>
             </>
           )}
-          {error && <p className="text-red-500 text-xs">{error}</p>}
-          {mensaje && <p className="text-green-600 text-xs">{mensaje}</p>}
+          {error && <p className="form-error">{error}</p>}
+          {mensaje && <p className="text-exito text-xs">{mensaje}</p>}
           <button className="btn-primario" onClick={handleSave}>
               Guardar cambios
           </button>

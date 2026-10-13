@@ -2,9 +2,9 @@ import React from 'react'
 
 export default function ModalLoading() {
   return (
-    <div className='fixed z-90 inset-0 bg-black/50 flex justify-center items-center'>
-      <div className='bg-white p-4 rounded-lg shadow'>
-          <p className='text-gray-700'> Cargando... </p>
+    <div className='modal-fondo'>
+      <div className='modal-caja'>
+          <p className='text-dark'> Cargando... </p>
       </div>
     </div>
   )

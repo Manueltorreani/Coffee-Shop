@@ -55,3 +55,54 @@ Tengo que **defender este proyecto**, así que necesito entender cada línea:
 - `diferencia = monto contado por el usuario − monto sistema` (negativo = falta plata).
 - `ArqueoCaja`: fechaApertura, fechaCierre, montoInicial, estado (ABIERTA/CERRADA), usuarioApertura/usuarioCierre (dos relaciones con nombre a `User`), y la **foto del cierre**: ventasEfectivo, ingresosManuales, gastosEfectivo, egresosManuales, montoSistema, montoUsuario, diferencia, comentario.
 - Reglas: no puede haber dos cajas abiertas (409), no se registran movimientos sin caja abierta, no se borran movimientos de una caja cerrada.
+
+## Sistema de diseño (marca Surf Coffee)
+Todo vive en **un solo archivo**: `front/src/index.css` (Tailwind v4, sin `tailwind.config.js`). La fuente se carga con un `<link>` en `front/index.html`.
+
+### Tokens (bloque `@theme`)
+Cada `--color-x` genera las clases `bg-x`, `text-x`, `border-x`, etc. Los colores se nombran por su **función**, no por su tono.
+
+| Token | Hex | Uso |
+|---|---|---|
+| `primary` | `#00A0C8` | botones principales, links, ítem activo del menú |
+| `primary-hover` | `#007EA5` | hover de lo anterior |
+| `primary-suave` | `#E5F5FA` | cabecera de tablas, fondo de pestañas, hover suave |
+| `secondary` | `#006B96` | badges de marca, borde de foco |
+| `nav` | `#005F8A` | sidebar, topbar, fondo del login |
+| `dark` | `#003B4F` | texto principal, fondos oscuros |
+| `fondo` | `#F2F7F9` | fondo de la app |
+| `superficie` | `#FFFFFF` | tarjetas, modales |
+| `borde` | `#D9E3E8` | bordes de tarjetas y filas |
+| `borde-fuerte` | `#B8C7CF` | bordes de inputs |
+| `texto-suave` | `#5B7480` | texto secundario, labels (más claro: `text-texto-suave/70`) |
+| `exito` / `exito-suave` | `#18794E` / `#E3F4EA` | activo, ingreso, diferencia 0 |
+| `error` / `error-suave` | `#C8323C` / `#FBE6E7` | errores, inactivo, egreso, faltante |
+| `aviso` / `aviso-suave` | `#9A5B00` / `#FCF0D9` | pendiente, sobrante de caja |
+
+### Tipografía
+- **Archivo** (Google Fonts), semi-expandida: `font-stretch: 112.5%` en `body`.
+- Cuerpo en **Regular (400)**; títulos `h1`–`h3` en **Medium Italic (500)** desde `@layer base`, sin clases.
+- Solo están cargados los pesos 400 y 500: para énfasis usar `font-medium`. **No usar** `font-semibold`, `font-bold` ni `font-black` (el navegador simula la negrita y se ve mal).
+
+### Clases reutilizables (`@layer components`)
+| Elemento | Clases |
+|---|---|
+| Botones | `btn-primario`, `btn-secundario`, `btn-peligro` |
+| Botones de ícono (tablas) | `btn-icono` + `btn-icono-editar` / `btn-icono-borrar` |
+| Formularios | `form-card`, `form-titulo`, `form-campo`, `form-input`, `form-error` |
+| Tablas | `tabla-card`, `tabla-head`, `tabla-fila`, `tabla-celda` (solo padding; la alineación va aparte) |
+| Badges | `badge` + una variante: `badge-exito`, `badge-error`, `badge-aviso`, `badge-neutro`, `badge-marca` |
+| Pestañas | `tabs`, `tab`, `tab-activo` |
+| Modales | `modal-fondo`, `modal-caja` (los usan `ModalModified` y `ModalLoading`) |
+| Otros | `card` (tarjeta genérica), `titulo-pagina` (el `h1` de cada página) |
+
+### Reglas
+- **Prohibido** escribir hex sueltos o colores crudos de Tailwind (`gray-500`, `red-600`, `bg-white`…) en los `.jsx`: usar siempre un token. Única excepción: blanco sobre fondos de color (`text-white`, `text-white/85`, `hover:bg-white/10`). En props que no aceptan clases (ej. gráficos de recharts) usar `var(--color-primary)`.
+- Si un conjunto de clases se repite en más de un archivo, va a `index.css` como clase con `@apply`, no se copia.
+- No crear otros archivos `.css`.
+- **Radios**: controles (botones, inputs) `rounded-xl`; tarjetas y modales `rounded-2xl`; badges `rounded-full`.
+- Un `border` siempre lleva color (`border-borde`): en Tailwind v4, sin color toma el del texto.
+- Estado activo/inactivo: `badge-exito` / `badge-error`. Badges que no indican estado (rol, categoría): `badge-marca` o `badge-neutro`.
+- Excepción: `Ticket.jsx` usa estilos inline y monospace porque es para impresión térmica; no sigue este sistema.
+- `#root` tiene `text-align: center` heredado de la plantilla de Vite: el texto queda centrado salvo que se indique `text-left` / `text-right`.
+- En tareas de diseño se toca **solo estilo** (CSS, `className`, colores): no lógica, estado, props ni estructura.
